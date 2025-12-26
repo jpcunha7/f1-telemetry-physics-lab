@@ -48,7 +48,8 @@ def create_speed_comparison_plot(
             y=telemetry1["Speed"],
             mode="lines",
             name=driver1_name,
-            line=dict(color="#FF1E1E", width=2),
+            line=dict(color=config.primary_color, width=2),
+            hovertemplate="Distance: %{x:.0f}m<br>Speed: %{y:.1f} km/h<extra></extra>",
         )
     )
 
@@ -59,7 +60,8 @@ def create_speed_comparison_plot(
             y=telemetry2["Speed"],
             mode="lines",
             name=driver2_name,
-            line=dict(color="#1E90FF", width=2),
+            line=dict(color=config.secondary_color, width=2),
+            hovertemplate="Distance: %{x:.0f}m<br>Speed: %{y:.1f} km/h<extra></extra>",
         )
     )
 
@@ -112,7 +114,7 @@ def create_throttle_brake_plot(
                 y=telemetry1["Throttle"],
                 mode="lines",
                 name=f"{driver1_name} Throttle",
-                line=dict(color="#FF1E1E", width=2),
+                line=dict(color=config.primary_color, width=2),
             ),
             row=1,
             col=1,
@@ -126,7 +128,7 @@ def create_throttle_brake_plot(
                 y=telemetry2["Throttle"],
                 mode="lines",
                 name=f"{driver2_name} Throttle",
-                line=dict(color="#1E90FF", width=2),
+                line=dict(color=config.secondary_color, width=2),
             ),
             row=1,
             col=1,
@@ -140,7 +142,7 @@ def create_throttle_brake_plot(
                 y=telemetry1["Brake"],
                 mode="lines",
                 name=f"{driver1_name} Brake",
-                line=dict(color="#FF1E1E", width=2),
+                line=dict(color=config.primary_color, width=2),
                 showlegend=False,
             ),
             row=2,
@@ -155,7 +157,7 @@ def create_throttle_brake_plot(
                 y=telemetry2["Brake"],
                 mode="lines",
                 name=f"{driver2_name} Brake",
-                line=dict(color="#1E90FF", width=2),
+                line=dict(color=config.secondary_color, width=2),
                 showlegend=False,
             ),
             row=2,
@@ -212,7 +214,7 @@ def create_gear_plot(
                 y=telemetry1["nGear"],
                 mode="lines",
                 name=driver1_name,
-                line=dict(color="#FF1E1E", width=2),
+                line=dict(color=config.primary_color, width=2),
                 fill="tozeroy",
             ),
             row=1,
@@ -227,7 +229,7 @@ def create_gear_plot(
                 y=telemetry2["nGear"],
                 mode="lines",
                 name=driver2_name,
-                line=dict(color="#1E90FF", width=2),
+                line=dict(color=config.secondary_color, width=2),
                 fill="tozeroy",
             ),
             row=2,
@@ -331,7 +333,7 @@ def create_segment_comparison_plot(
     deltas = [s.time_delta for s in segment_comparisons]
 
     # Color based on winner
-    colors = ["#1E90FF" if d < 0 else "#FF1E1E" for d in deltas]
+    colors = [config.secondary_color if d < 0 else config.primary_color for d in deltas]
 
     fig = go.Figure()
 
@@ -498,7 +500,7 @@ def create_acceleration_plot(
                 y=telemetry1["Acceleration"],
                 mode="lines",
                 name=driver1_name,
-                line=dict(color="#FF1E1E", width=2),
+                line=dict(color=config.primary_color, width=2),
             )
         )
 
@@ -510,7 +512,7 @@ def create_acceleration_plot(
                 y=telemetry2["Acceleration"],
                 mode="lines",
                 name=driver2_name,
-                line=dict(color="#1E90FF", width=2),
+                line=dict(color=config.secondary_color, width=2),
             )
         )
 

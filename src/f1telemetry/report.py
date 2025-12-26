@@ -175,7 +175,6 @@ HTML_TEMPLATE = """
     <div class="footer">
         <p><strong>F1 Telemetry Physics Lab</strong></p>
         <p>Author: João Pedro Cunha | Data: FastF1</p>
-        <p>Generated with Claude Code</p>
     </div>
 </body>
 </html>

@@ -41,11 +41,32 @@ class Config:
     # Segment analysis
     num_segments: int = 10  # number of segments for lap division
 
+    # Minisector analysis
+    num_minisectors: int = 50  # number of minisectors for fine-grained delta analysis
+    minisector_variance_threshold: float = 0.05  # seconds, threshold for identifying mistake zones
+
+    # Corner detection
+    corner_min_speed_threshold: float = 100.0  # km/h, maximum speed to consider as corner
+    corner_prominence: float = 15.0  # km/h, minimum speed drop to detect corner
+    corner_min_distance: int = 30  # samples, minimum distance between corners
+
+    # G-G diagram and acceleration
+    max_lateral_g: float = 6.0  # maximum lateral g-force for clipping
+    max_longitudinal_g: float = 5.0  # maximum longitudinal g-force for clipping
+    brake_g_threshold: float = 1.0  # g-force threshold for braking zone detection
+    traction_g_threshold: float = 0.5  # g-force threshold for traction zone detection
+    cornering_g_threshold: float = 1.0  # lateral g threshold for cornering zone detection
+
+    # Multi-lap analysis
+    consistency_threshold_sigma: float = 2.0  # sigma multiplier for outlier detection
+
     # Plotting settings
     plot_dpi: int = 150
     plot_width: int = 1200
     plot_height: int = 600
     plot_theme: str = "plotly_dark"
+    primary_color: str = "#FF1E1E"  # F1 red
+    secondary_color: str = "#1E90FF"  # Blue
 
     # Report settings
     report_dir: Path = field(default_factory=lambda: Path("reports"))
@@ -84,10 +105,23 @@ class Config:
             "brake_threshold": self.brake_threshold,
             "speed_threshold_corner": self.speed_threshold_corner,
             "num_segments": self.num_segments,
+            "num_minisectors": self.num_minisectors,
+            "minisector_variance_threshold": self.minisector_variance_threshold,
+            "corner_min_speed_threshold": self.corner_min_speed_threshold,
+            "corner_prominence": self.corner_prominence,
+            "corner_min_distance": self.corner_min_distance,
+            "max_lateral_g": self.max_lateral_g,
+            "max_longitudinal_g": self.max_longitudinal_g,
+            "brake_g_threshold": self.brake_g_threshold,
+            "traction_g_threshold": self.traction_g_threshold,
+            "cornering_g_threshold": self.cornering_g_threshold,
+            "consistency_threshold_sigma": self.consistency_threshold_sigma,
             "plot_dpi": self.plot_dpi,
             "plot_width": self.plot_width,
             "plot_height": self.plot_height,
             "plot_theme": self.plot_theme,
+            "primary_color": self.primary_color,
+            "secondary_color": self.secondary_color,
             "report_dir": str(self.report_dir),
             "output_format": self.output_format,
         }

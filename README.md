@@ -62,8 +62,8 @@ All functionality uses **100% free and open-source** tools and data sources (Fas
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/f1telemetry.git
-cd f1telemetry
+git clone https://github.com/jpcunha7/f1-telemetry-physics-lab.git
+cd f1-telemetry-physics-lab
 
 # Install dependencies
 poetry install
@@ -76,8 +76,8 @@ poetry shell
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/f1telemetry.git
-cd f1telemetry
+git clone https://github.com/jpcunha7/f1-telemetry-physics-lab.git
+cd f1-telemetry-physics-lab
 
 # Create virtual environment
 python -m venv venv
@@ -385,8 +385,4 @@ Copyright (c) 2025 João Pedro Cunha
 
 For questions, issues, or suggestions:
 - Open an issue on GitHub
-- Email: [your-email@example.com]
 
----
-
-**Built with Claude Code** | Data powered by FastF1

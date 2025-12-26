@@ -7,10 +7,22 @@ Author: João Pedro Cunha
 License: MIT
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "João Pedro Cunha"
 
-from f1telemetry import config, data_loader, alignment, physics, metrics, viz
+from f1telemetry import (
+    config,
+    data_loader,
+    alignment,
+    physics,
+    metrics,
+    viz,
+    minisectors,
+    corners,
+    delta_decomp,
+    gg_diagram,
+    multilap,
+)
 
 __all__ = [
     "config",
@@ -19,4 +31,9 @@ __all__ = [
     "physics",
     "metrics",
     "viz",
+    "minisectors",
+    "corners",
+    "delta_decomp",
+    "gg_diagram",
+    "multilap",
 ]
