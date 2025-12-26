@@ -6,7 +6,6 @@ Author: João Pedro Cunha
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from f1telemetry.physics import (
     smooth_signal,

@@ -15,7 +15,7 @@ import pandas as pd
 from jinja2 import Template
 
 from f1telemetry.config import Config, DEFAULT_CONFIG
-from f1telemetry import alignment, physics, metrics, viz
+from f1telemetry import physics, metrics, viz
 
 logger = logging.getLogger(__name__)
 

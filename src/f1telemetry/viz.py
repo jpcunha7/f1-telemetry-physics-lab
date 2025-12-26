@@ -7,7 +7,6 @@ Author: João Pedro Cunha
 """
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -270,9 +269,6 @@ def create_delta_time_plot(
         Plotly figure
     """
     fig = go.Figure()
-
-    # Color based on who's ahead
-    colors = ["#FF1E1E" if dt > 0 else "#1E90FF" for dt in delta_time]
 
     fig.add_trace(
         go.Scatter(

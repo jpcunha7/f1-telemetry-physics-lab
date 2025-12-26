@@ -9,7 +9,7 @@ Author: João Pedro Cunha
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 # Configure logging
 logging.basicConfig(

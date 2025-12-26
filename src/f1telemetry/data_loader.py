@@ -11,7 +11,7 @@ from typing import Optional, Union
 
 import fastf1
 import pandas as pd
-from fastf1.core import Lap, Laps, Session
+from fastf1.core import Lap, Session
 
 from f1telemetry.config import Config, DEFAULT_CONFIG, SessionType
 
