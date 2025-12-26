@@ -267,7 +267,8 @@ def analyze_corner_comparison(corner1: Corner, corner2: Corner) -> dict:
         "exit_speed_delta": corner1.exit_speed - corner2.exit_speed,
         "brake_distance_delta": corner1.brake_distance - corner2.brake_distance,
         "peak_decel_delta": corner1.peak_deceleration - corner2.peak_deceleration,
-        "throttle_distance_delta": corner1.throttle_reapply_distance - corner2.throttle_reapply_distance,
+        "throttle_distance_delta": corner1.throttle_reapply_distance
+        - corner2.throttle_reapply_distance,
     }
 
 
@@ -400,10 +401,7 @@ def create_corner_markers_map(
                 "<extra></extra>"
             ),
             customdata=np.array(
-                [
-                    [c.min_speed, c.entry_speed, c.exit_speed, c.corner_type]
-                    for c in corners
-                ]
+                [[c.min_speed, c.entry_speed, c.exit_speed, c.corner_type] for c in corners]
             ),
         )
     )
@@ -415,9 +413,7 @@ def create_corner_markers_map(
         scaleanchor="y",
         scaleratio=1,
     )
-    fig.update_yaxes(
-        showgrid=False, showticklabels=False, zeroline=False
-    )
+    fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False)
 
     fig.update_layout(
         title=f"Track Map with Corner Catalog ({driver_name})",

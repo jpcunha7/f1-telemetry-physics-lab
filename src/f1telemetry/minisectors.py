@@ -86,9 +86,7 @@ def compute_minisector_deltas(
     total_distance = distance[-1] - distance[0]
     minisector_length = total_distance / n_minisectors
 
-    minisector_boundaries = np.linspace(
-        distance[0], distance[-1], n_minisectors + 1
-    )
+    minisector_boundaries = np.linspace(distance[0], distance[-1], n_minisectors + 1)
 
     # Initialize result arrays
     minisector_ids = np.arange(n_minisectors)
@@ -225,9 +223,7 @@ def create_minisector_bar_chart(
         Plotly figure with bar chart
     """
     # Color bars based on who is faster
-    colors = [
-        "#1E90FF" if delta < 0 else "#FF1E1E" for delta in minisector_data.time_delta
-    ]
+    colors = ["#1E90FF" if delta < 0 else "#FF1E1E" for delta in minisector_data.time_delta]
 
     fig = go.Figure()
 
@@ -313,12 +309,8 @@ def create_minisector_track_map(
 
     # Assign each telemetry point to a minisector
     distance = telemetry["Distance"].values
-    minisector_assignment = np.digitize(
-        distance, minisector_data.distance_start, right=False
-    ) - 1
-    minisector_assignment = np.clip(
-        minisector_assignment, 0, len(minisector_data.time_delta) - 1
-    )
+    minisector_assignment = np.digitize(distance, minisector_data.distance_start, right=False) - 1
+    minisector_assignment = np.clip(minisector_assignment, 0, len(minisector_data.time_delta) - 1)
 
     # Map time delta to each point
     delta_at_point = minisector_data.time_delta[minisector_assignment]
@@ -358,7 +350,10 @@ def create_minisector_track_map(
             name=driver_name,
             showlegend=False,
             hovertemplate=(
-                "X: %{x:.0f}m<br>" "Y: %{y:.0f}m<br>" "Delta: %{marker.color:.3f}s<br>" "<extra></extra>"
+                "X: %{x:.0f}m<br>"
+                "Y: %{y:.0f}m<br>"
+                "Delta: %{marker.color:.3f}s<br>"
+                "<extra></extra>"
             ),
         )
     )
@@ -370,9 +365,7 @@ def create_minisector_track_map(
         scaleanchor="y",
         scaleratio=1,
     )
-    fig.update_yaxes(
-        showgrid=False, showticklabels=False, zeroline=False
-    )
+    fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False)
 
     fig.update_layout(
         title=f"Track Map - Minisector Deltas ({driver_name})",

@@ -89,9 +89,7 @@ def compute_lap_consistency(lap_times: np.ndarray) -> ConsistencyMetrics:
 
     # Find outliers using 2-sigma rule
     threshold = 2 * std_time
-    outlier_indices = [
-        i for i, t in enumerate(lap_times) if abs(t - avg_time) > threshold
-    ]
+    outlier_indices = [i for i, t in enumerate(lap_times) if abs(t - avg_time) > threshold]
 
     best_idx = int(np.argmin(lap_times))
     worst_idx = int(np.argmax(lap_times))

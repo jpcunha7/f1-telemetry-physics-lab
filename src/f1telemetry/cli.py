@@ -203,9 +203,7 @@ def minisectors_command(args: argparse.Namespace) -> int:
         )
 
         # Create table
-        table = minisectors.create_minisector_comparison_table(
-            minisector_data, driver1, driver2
-        )
+        table = minisectors.create_minisector_comparison_table(minisector_data, driver1, driver2)
 
         # Save to CSV
         output_path = Path(args.output) if args.output else config.report_dir / "minisectors.csv"
@@ -414,9 +412,15 @@ Author: João Pedro Cunha
     minisectors_parser.add_argument("--session", type=str, required=True, help="Session type")
     minisectors_parser.add_argument("--driver1", type=str, required=True, help="First driver code")
     minisectors_parser.add_argument("--driver2", type=str, required=True, help="Second driver code")
-    minisectors_parser.add_argument("--lap1", type=str, default="fastest", help="Lap selection for driver1")
-    minisectors_parser.add_argument("--lap2", type=str, default="fastest", help="Lap selection for driver2")
-    minisectors_parser.add_argument("--n-minisectors", type=int, default=50, help="Number of minisectors")
+    minisectors_parser.add_argument(
+        "--lap1", type=str, default="fastest", help="Lap selection for driver1"
+    )
+    minisectors_parser.add_argument(
+        "--lap2", type=str, default="fastest", help="Lap selection for driver2"
+    )
+    minisectors_parser.add_argument(
+        "--n-minisectors", type=int, default=50, help="Number of minisectors"
+    )
     minisectors_parser.add_argument("--output", type=str, help="Output CSV file path")
     minisectors_parser.add_argument("--cache-dir", type=str, help="FastF1 cache directory")
     minisectors_parser.add_argument("--no-cache", action="store_true", help="Disable caching")
@@ -432,8 +436,12 @@ Author: João Pedro Cunha
     corners_parser.add_argument("--session", type=str, required=True, help="Session type")
     corners_parser.add_argument("--driver1", type=str, required=True, help="First driver code")
     corners_parser.add_argument("--driver2", type=str, required=True, help="Second driver code")
-    corners_parser.add_argument("--lap1", type=str, default="fastest", help="Lap selection for driver1")
-    corners_parser.add_argument("--lap2", type=str, default="fastest", help="Lap selection for driver2")
+    corners_parser.add_argument(
+        "--lap1", type=str, default="fastest", help="Lap selection for driver1"
+    )
+    corners_parser.add_argument(
+        "--lap2", type=str, default="fastest", help="Lap selection for driver2"
+    )
     corners_parser.add_argument("--output", type=str, help="Output CSV file path")
     corners_parser.add_argument("--cache-dir", type=str, help="FastF1 cache directory")
     corners_parser.add_argument("--no-cache", action="store_true", help="Disable caching")

@@ -114,9 +114,7 @@ def compute_curvature_from_heading(
     curvature = dheading / ddistance
 
     # Smooth curvature to reduce noise
-    curvature_smooth = smooth_signal(
-        curvature, config.smoothing_window, config.smoothing_polyorder
-    )
+    curvature_smooth = smooth_signal(curvature, config.smoothing_window, config.smoothing_polyorder)
 
     return curvature_smooth
 
@@ -315,8 +313,22 @@ def create_gg_plot(
     annotations = [
         dict(x=0, y=4.5, text="Acceleration", showarrow=False, font=dict(size=10, color="gray")),
         dict(x=0, y=-4.5, text="Braking", showarrow=False, font=dict(size=10, color="gray")),
-        dict(x=-4.5, y=0, text="Right", showarrow=False, font=dict(size=10, color="gray"), textangle=-90),
-        dict(x=4.5, y=0, text="Left", showarrow=False, font=dict(size=10, color="gray"), textangle=-90),
+        dict(
+            x=-4.5,
+            y=0,
+            text="Right",
+            showarrow=False,
+            font=dict(size=10, color="gray"),
+            textangle=-90,
+        ),
+        dict(
+            x=4.5,
+            y=0,
+            text="Left",
+            showarrow=False,
+            font=dict(size=10, color="gray"),
+            textangle=-90,
+        ),
     ]
 
     fig.update_layout(
