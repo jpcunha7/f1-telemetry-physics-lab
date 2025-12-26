@@ -261,7 +261,7 @@ def page_overview():
         st.metric("Date", info['date'])
 
     with col4:
-        lap_delta = st.session_state.comparison_summary['lap_time_delta']
+        lap_delta = st.session_state.comparison_summary['final_delta']
         st.metric(
             "Lap Time Delta",
             f"{abs(lap_delta):.3f}s",
