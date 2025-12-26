@@ -83,9 +83,6 @@ def compute_minisector_deltas(
     throttle2 = telemetry2["Throttle"].values if "Throttle" in telemetry2.columns else None
 
     # Define minisector boundaries
-    total_distance = distance[-1] - distance[0]
-    minisector_length = total_distance / n_minisectors
-
     minisector_boundaries = np.linspace(distance[0], distance[-1], n_minisectors + 1)
 
     # Initialize result arrays
