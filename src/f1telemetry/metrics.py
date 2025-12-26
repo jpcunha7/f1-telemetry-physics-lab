@@ -73,8 +73,8 @@ def compute_segment_times(
     Returns:
         List of segment times in seconds
     """
-    distance = telemetry['Distance'].values
-    speed_ms = telemetry['Speed'].values / 3.6  # Convert to m/s
+    distance = telemetry["Distance"].values
+    speed_ms = telemetry["Speed"].values / 3.6  # Convert to m/s
 
     segment_times = []
 
@@ -116,7 +116,7 @@ def compare_segments(
         List of SegmentComparison objects
     """
     # Create segments
-    distance_array = telemetry1['Distance'].values
+    distance_array = telemetry1["Distance"].values
     segments = divide_lap_into_segments(distance_array, config.num_segments)
 
     # Compute times for each driver
@@ -179,18 +179,14 @@ def generate_insights(
     if abs(final_delta) < 0.01:
         insights.append(f"⏱️ The laps are virtually identical (Δt = {final_delta:.3f}s)")
     elif final_delta < 0:
-        insights.append(
-            f"⏱️ {driver1_name} is {abs(final_delta):.3f}s faster than {driver2_name}"
-        )
+        insights.append(f"⏱️ {driver1_name} is {abs(final_delta):.3f}s faster than {driver2_name}")
     else:
-        insights.append(
-            f"⏱️ {driver2_name} is {abs(final_delta):.3f}s faster than {driver1_name}"
-        )
+        insights.append(f"⏱️ {driver2_name} is {abs(final_delta):.3f}s faster than {driver1_name}")
 
     # Maximum delta
     max_delta_idx = np.argmax(np.abs(delta_time))
     max_delta = delta_time[max_delta_idx]
-    max_delta_dist = telemetry1['Distance'].values[max_delta_idx]
+    max_delta_dist = telemetry1["Distance"].values[max_delta_idx]
 
     if abs(max_delta) > 0.05:
         leader = driver2_name if max_delta > 0 else driver1_name
@@ -204,8 +200,7 @@ def generate_insights(
     driver2_wins = sum(1 for s in segment_comparisons if s.winner == "driver2")
 
     insights.append(
-        f"📊 Segment wins: {driver1_name} ({driver1_wins}), "
-        f"{driver2_name} ({driver2_wins})"
+        f"📊 Segment wins: {driver1_name} ({driver1_wins}), " f"{driver2_name} ({driver2_wins})"
     )
 
     # Biggest segment gain
@@ -218,10 +213,10 @@ def generate_insights(
         )
 
     # Speed comparison
-    avg_speed1 = telemetry1['Speed'].mean()
-    avg_speed2 = telemetry2['Speed'].mean()
-    max_speed1 = telemetry1['Speed'].max()
-    max_speed2 = telemetry2['Speed'].max()
+    avg_speed1 = telemetry1["Speed"].mean()
+    avg_speed2 = telemetry2["Speed"].mean()
+    max_speed1 = telemetry1["Speed"].max()
+    max_speed2 = telemetry2["Speed"].max()
 
     insights.append(
         f"🏎️ Average speed: {driver1_name} {avg_speed1:.1f} km/h, "
@@ -284,8 +279,8 @@ def create_comparison_summary(
     return {
         "driver1_name": driver1_name,
         "driver2_name": driver2_name,
-        "lap1_time": getattr(lap1, 'LapTime', None),
-        "lap2_time": getattr(lap2, 'LapTime', None),
+        "lap1_time": getattr(lap1, "LapTime", None),
+        "lap2_time": getattr(lap2, "LapTime", None),
         "delta_time": delta_time,
         "final_delta": float(delta_time[-1]),
         "segment_comparisons": segment_comparisons,

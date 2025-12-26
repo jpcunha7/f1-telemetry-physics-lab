@@ -34,12 +34,14 @@ def create_mock_telemetry() -> pd.DataFrame:
     throttle = np.where(distance < 50, 100, np.where(distance < 100, 0, 80))
     brake = np.where((distance >= 50) & (distance < 80), 80, 0)
 
-    return pd.DataFrame({
-        'Distance': distance,
-        'Speed': speed,
-        'Throttle': throttle,
-        'Brake': brake,
-    })
+    return pd.DataFrame(
+        {
+            "Distance": distance,
+            "Speed": speed,
+            "Throttle": throttle,
+            "Brake": brake,
+        }
+    )
 
 
 class TestSmoothSignal:
@@ -86,10 +88,12 @@ class TestComputeAcceleration:
     def test_constant_speed_zero_acceleration(self):
         """Test constant speed produces near-zero acceleration."""
         distance = np.linspace(0, 1000, 100)
-        telemetry = pd.DataFrame({
-            'Distance': distance,
-            'Speed': np.full(100, 200.0),
-        })
+        telemetry = pd.DataFrame(
+            {
+                "Distance": distance,
+                "Speed": np.full(100, 200.0),
+            }
+        )
         config = Config()
 
         acceleration = compute_acceleration(telemetry, config)
@@ -101,10 +105,12 @@ class TestComputeAcceleration:
         """Test increasing speed produces positive acceleration."""
         distance = np.linspace(0, 1000, 100)
         speed = np.linspace(100, 300, 100)  # Accelerating
-        telemetry = pd.DataFrame({
-            'Distance': distance,
-            'Speed': speed,
-        })
+        telemetry = pd.DataFrame(
+            {
+                "Distance": distance,
+                "Speed": speed,
+            }
+        )
         config = Config()
 
         acceleration = compute_acceleration(telemetry, config)
@@ -127,10 +133,12 @@ class TestDetectBrakingZones:
 
     def test_no_brake_column_returns_empty(self):
         """Test returns empty list when Brake column missing."""
-        telemetry = pd.DataFrame({
-            'Distance': np.linspace(0, 1000, 100),
-            'Speed': np.full(100, 200.0),
-        })
+        telemetry = pd.DataFrame(
+            {
+                "Distance": np.linspace(0, 1000, 100),
+                "Speed": np.full(100, 200.0),
+            }
+        )
         config = Config()
 
         zones = detect_braking_zones(telemetry, config=config)
@@ -146,11 +154,11 @@ class TestDetectBrakingZones:
 
         if len(zones) > 0:
             zone = zones[0]
-            assert hasattr(zone, 'start_distance')
-            assert hasattr(zone, 'end_distance')
-            assert hasattr(zone, 'entry_speed')
-            assert hasattr(zone, 'min_speed')
-            assert hasattr(zone, 'braking_distance')
+            assert hasattr(zone, "start_distance")
+            assert hasattr(zone, "end_distance")
+            assert hasattr(zone, "entry_speed")
+            assert hasattr(zone, "min_speed")
+            assert hasattr(zone, "braking_distance")
 
 
 class TestDetectCorners:
@@ -171,20 +179,22 @@ class TestDetectCorners:
         # Create telemetry with clear corner
         distance = np.linspace(0, 1000, 200)
         speed = 250 - 100 * np.abs(np.sin(distance / 200))  # Oscillating speed
-        telemetry = pd.DataFrame({
-            'Distance': distance,
-            'Speed': speed,
-        })
+        telemetry = pd.DataFrame(
+            {
+                "Distance": distance,
+                "Speed": speed,
+            }
+        )
         config = Config(speed_threshold_corner=200.0)
 
         corners = detect_corners(telemetry, config=config)
 
         if len(corners) > 0:
             corner = corners[0]
-            assert hasattr(corner, 'distance')
-            assert hasattr(corner, 'min_speed')
-            assert hasattr(corner, 'entry_speed')
-            assert hasattr(corner, 'exit_speed')
+            assert hasattr(corner, "distance")
+            assert hasattr(corner, "min_speed")
+            assert hasattr(corner, "entry_speed")
+            assert hasattr(corner, "exit_speed")
 
 
 class TestAddPhysicsChannels:
@@ -197,7 +207,7 @@ class TestAddPhysicsChannels:
 
         result = add_physics_channels(telemetry, config)
 
-        assert 'Acceleration' in result.columns
+        assert "Acceleration" in result.columns
 
     def test_original_telemetry_unchanged(self):
         """Test original telemetry is not modified."""
@@ -210,7 +220,7 @@ class TestAddPhysicsChannels:
         # Original should be unchanged
         assert telemetry.columns.tolist() == original_columns
         # Result should have new column
-        assert 'Acceleration' in result.columns
+        assert "Acceleration" in result.columns
 
     def test_acceleration_values_reasonable(self):
         """Test acceleration values are in reasonable range for F1."""
@@ -221,5 +231,5 @@ class TestAddPhysicsChannels:
 
         # F1 cars typically: -5 to +2 g (but our approximation is rougher)
         # Just check no extreme outliers (mock data has sharp transitions)
-        assert result['Acceleration'].min() > -50  # Allow for approximation roughness
-        assert result['Acceleration'].max() < 20  # Allow for approximation roughness
+        assert result["Acceleration"].min() > -50  # Allow for approximation roughness
+        assert result["Acceleration"].max() < 20  # Allow for approximation roughness

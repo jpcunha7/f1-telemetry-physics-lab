@@ -18,19 +18,23 @@ from f1telemetry.alignment import (
 from f1telemetry.config import Config
 
 
-def create_mock_telemetry(start_dist: float = 0, end_dist: float = 1000, num_points: int = 100) -> pd.DataFrame:
+def create_mock_telemetry(
+    start_dist: float = 0, end_dist: float = 1000, num_points: int = 100
+) -> pd.DataFrame:
     """Create mock telemetry data for testing."""
     distance = np.linspace(start_dist, end_dist, num_points)
     speed = 200 + 50 * np.sin(distance / 100)  # Varying speed
     throttle = np.clip(50 + 40 * np.sin(distance / 80), 0, 100)
     brake = np.clip(20 * np.cos(distance / 90), 0, 100)
 
-    return pd.DataFrame({
-        'Distance': distance,
-        'Speed': speed,
-        'Throttle': throttle,
-        'Brake': brake,
-    })
+    return pd.DataFrame(
+        {
+            "Distance": distance,
+            "Speed": speed,
+            "Throttle": throttle,
+            "Brake": brake,
+        }
+    )
 
 
 class TestValidateTelemetry:
@@ -49,7 +53,7 @@ class TestValidateTelemetry:
 
     def test_missing_columns(self):
         """Test validation fails for missing required columns."""
-        telemetry = pd.DataFrame({'Distance': [1, 2, 3]})
+        telemetry = pd.DataFrame({"Distance": [1, 2, 3]})
         with pytest.raises(ValueError, match="missing required columns"):
             validate_telemetry(telemetry)
 
@@ -89,9 +93,9 @@ class TestInterpolateTelemetry:
 
         interpolated = interpolate_telemetry(telemetry, distance_array)
 
-        assert 'Distance' in interpolated.columns
-        assert 'Speed' in interpolated.columns
-        assert 'Throttle' in interpolated.columns
+        assert "Distance" in interpolated.columns
+        assert "Speed" in interpolated.columns
+        assert "Throttle" in interpolated.columns
 
     def test_interpolation_preserves_distance(self):
         """Test interpolation uses provided distance array."""
@@ -100,7 +104,7 @@ class TestInterpolateTelemetry:
 
         interpolated = interpolate_telemetry(telemetry, distance_array)
 
-        np.testing.assert_array_almost_equal(interpolated['Distance'].values, distance_array)
+        np.testing.assert_array_almost_equal(interpolated["Distance"].values, distance_array)
 
 
 class TestAlignLaps:
@@ -124,8 +128,8 @@ class TestAlignLaps:
         config = Config(distance_resolution=5.0)
         aligned1, aligned2 = align_laps(tel1, tel2, config)
 
-        assert aligned1['Distance'].min() >= 100
-        assert aligned1['Distance'].max() <= 900
+        assert aligned1["Distance"].min() >= 100
+        assert aligned1["Distance"].max() <= 900
 
     def test_no_overlap_raises_error(self):
         """Test alignment fails when no overlap exists."""
@@ -153,10 +157,12 @@ class TestComputeDeltaTime:
     def test_same_speed_zero_delta(self):
         """Test delta time is approximately zero for same speeds."""
         distance = np.linspace(0, 1000, 100)
-        telemetry = pd.DataFrame({
-            'Distance': distance,
-            'Speed': np.full(100, 200.0),
-        })
+        telemetry = pd.DataFrame(
+            {
+                "Distance": distance,
+                "Speed": np.full(100, 200.0),
+            }
+        )
 
         delta = compute_delta_time(telemetry, telemetry)
 
@@ -167,7 +173,7 @@ class TestComputeDeltaTime:
         """Test faster driver has negative cumulative delta."""
         tel1 = create_mock_telemetry(0, 1000, 100)
         tel2 = tel1.copy()
-        tel2['Speed'] = tel2['Speed'] * 0.95  # Driver 2 slower
+        tel2["Speed"] = tel2["Speed"] * 0.95  # Driver 2 slower
 
         delta = compute_delta_time(tel1, tel2)
 

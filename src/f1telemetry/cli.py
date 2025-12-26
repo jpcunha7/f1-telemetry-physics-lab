@@ -64,8 +64,7 @@ def generate_report_command(args: argparse.Namespace) -> int:
         )
 
         logger.info(
-            f"Loading data: {year} {args.event} {session_type} - "
-            f"{driver1} vs {driver2}"
+            f"Loading data: {year} {args.event} {session_type} - " f"{driver1} vs {driver2}"
         )
 
         # Load data
@@ -101,7 +100,7 @@ def generate_report_command(args: argparse.Namespace) -> int:
             output_path = Path(args.output)
         else:
             # Generate default filename
-            event_name = session_info['event_name'].replace(' ', '_')
+            event_name = session_info["event_name"].replace(" ", "_")
             filename = f"report_{event_name}_{session_type}_{driver1}_vs_{driver2}.html"
             output_path = config.report_dir / filename
 
@@ -126,9 +125,12 @@ def generate_report_command(args: argparse.Namespace) -> int:
 
             # Create comparison summary for plots
             comparison_summary = metrics.create_comparison_summary(
-                lap1, lap2,
-                telemetry1, telemetry2,
-                driver1, driver2,
+                lap1,
+                lap2,
+                telemetry1,
+                telemetry2,
+                driver1,
+                driver2,
                 config,
             )
 
@@ -175,111 +177,111 @@ Author: João Pedro Cunha
         """,
     )
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Report command
     report_parser = subparsers.add_parser(
-        'report',
-        help='Generate lap comparison report',
+        "report",
+        help="Generate lap comparison report",
     )
 
     # Required arguments
     report_parser.add_argument(
-        '--year',
+        "--year",
         type=int,
         required=True,
-        help='Season year (e.g., 2024)',
+        help="Season year (e.g., 2024)",
     )
     report_parser.add_argument(
-        '--event',
+        "--event",
         type=str,
         required=True,
         help='Event name (e.g., "Monaco", "Monza") or round number',
     )
     report_parser.add_argument(
-        '--session',
+        "--session",
         type=str,
         required=True,
-        help='Session type: FP1, FP2, FP3, Q, S, R',
+        help="Session type: FP1, FP2, FP3, Q, S, R",
     )
     report_parser.add_argument(
-        '--driver1',
+        "--driver1",
         type=str,
         required=True,
-        help='First driver code (e.g., VER)',
+        help="First driver code (e.g., VER)",
     )
     report_parser.add_argument(
-        '--driver2',
+        "--driver2",
         type=str,
         required=True,
-        help='Second driver code (e.g., LEC)',
+        help="Second driver code (e.g., LEC)",
     )
 
     # Optional arguments
     report_parser.add_argument(
-        '--lap1',
+        "--lap1",
         type=str,
-        default='fastest',
+        default="fastest",
         help='Lap selection for driver1: "fastest" or lap number (default: fastest)',
     )
     report_parser.add_argument(
-        '--lap2',
+        "--lap2",
         type=str,
-        default='fastest',
+        default="fastest",
         help='Lap selection for driver2: "fastest" or lap number (default: fastest)',
     )
     report_parser.add_argument(
-        '--output',
+        "--output",
         type=str,
-        help='Output HTML file path (default: auto-generated in reports/)',
+        help="Output HTML file path (default: auto-generated in reports/)",
     )
     report_parser.add_argument(
-        '--resolution',
+        "--resolution",
         type=float,
         default=5.0,
-        help='Distance resolution in meters (default: 5.0)',
+        help="Distance resolution in meters (default: 5.0)",
     )
     report_parser.add_argument(
-        '--segments',
+        "--segments",
         type=int,
         default=10,
-        help='Number of segments for lap division (default: 10)',
+        help="Number of segments for lap division (default: 10)",
     )
     report_parser.add_argument(
-        '--cache-dir',
+        "--cache-dir",
         type=str,
-        help='FastF1 cache directory (default: cache/)',
+        help="FastF1 cache directory (default: cache/)",
     )
     report_parser.add_argument(
-        '--no-cache',
-        action='store_true',
-        help='Disable FastF1 caching',
+        "--no-cache",
+        action="store_true",
+        help="Disable FastF1 caching",
     )
     report_parser.add_argument(
-        '--save-plots',
-        action='store_true',
-        help='Save plots as PNG images',
+        "--save-plots",
+        action="store_true",
+        help="Save plots as PNG images",
     )
     report_parser.add_argument(
-        '--verbose',
-        '-v',
-        action='store_true',
-        help='Enable verbose logging',
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose logging",
     )
 
     # Parse arguments
     args = parser.parse_args()
 
     # Set up logging
-    setup_logging(args.verbose if hasattr(args, 'verbose') else False)
+    setup_logging(args.verbose if hasattr(args, "verbose") else False)
 
     # Execute command
-    if args.command == 'report':
+    if args.command == "report":
         return generate_report_command(args)
     else:
         parser.print_help()
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

@@ -218,45 +218,50 @@ def generate_html_report(
 
     # Compute metrics
     comparison_summary = metrics.create_comparison_summary(
-        lap1, lap2,
-        telemetry1, telemetry2,
-        driver1_name, driver2_name,
+        lap1,
+        lap2,
+        telemetry1,
+        telemetry2,
+        driver1_name,
+        driver2_name,
         config,
     )
 
     # Create plots
     plot_speed = viz.create_speed_comparison_plot(
         telemetry1, telemetry2, driver1_name, driver2_name, config
-    ).to_html(include_plotlyjs='cdn', div_id='speed_plot')
+    ).to_html(include_plotlyjs="cdn", div_id="speed_plot")
 
     plot_delta = viz.create_delta_time_plot(
-        comparison_summary['delta_time'],
-        telemetry1['Distance'].values,
-        driver1_name, driver2_name,
+        comparison_summary["delta_time"],
+        telemetry1["Distance"].values,
+        driver1_name,
+        driver2_name,
         config,
-    ).to_html(include_plotlyjs=False, div_id='delta_plot')
+    ).to_html(include_plotlyjs=False, div_id="delta_plot")
 
     plot_segments = viz.create_segment_comparison_plot(
-        comparison_summary['segment_comparisons'],
-        driver1_name, driver2_name,
+        comparison_summary["segment_comparisons"],
+        driver1_name,
+        driver2_name,
         config,
-    ).to_html(include_plotlyjs=False, div_id='segments_plot')
+    ).to_html(include_plotlyjs=False, div_id="segments_plot")
 
     plot_throttle_brake = viz.create_throttle_brake_plot(
         telemetry1, telemetry2, driver1_name, driver2_name, config
-    ).to_html(include_plotlyjs=False, div_id='throttle_brake_plot')
+    ).to_html(include_plotlyjs=False, div_id="throttle_brake_plot")
 
     plot_gear = viz.create_gear_plot(
         telemetry1, telemetry2, driver1_name, driver2_name, config
-    ).to_html(include_plotlyjs=False, div_id='gear_plot')
+    ).to_html(include_plotlyjs=False, div_id="gear_plot")
 
     plot_acceleration = viz.create_acceleration_plot(
         telemetry1, telemetry2, driver1_name, driver2_name, config
-    ).to_html(include_plotlyjs=False, div_id='acceleration_plot')
+    ).to_html(include_plotlyjs=False, div_id="acceleration_plot")
 
     plot_track_map = viz.create_track_map(
-        telemetry1, telemetry2, driver1_name, driver2_name, 'Speed', config
-    ).to_html(include_plotlyjs=False, div_id='track_map_plot')
+        telemetry1, telemetry2, driver1_name, driver2_name, "Speed", config
+    ).to_html(include_plotlyjs=False, div_id="track_map_plot")
 
     # Render template
     template = Template(HTML_TEMPLATE)
@@ -264,8 +269,8 @@ def generate_html_report(
         session_info=session_info,
         driver1_name=driver1_name,
         driver2_name=driver2_name,
-        final_delta=comparison_summary['final_delta'],
-        insights=comparison_summary['insights'],
+        final_delta=comparison_summary["final_delta"],
+        insights=comparison_summary["insights"],
         plot_speed=plot_speed,
         plot_delta=plot_delta,
         plot_segments=plot_segments,
@@ -280,7 +285,7 @@ def generate_html_report(
     if output_path:
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(html_content, encoding='utf-8')
+        output_path.write_text(html_content, encoding="utf-8")
         logger.info(f"Report saved to: {output_path}")
 
     return html_content
@@ -314,31 +319,31 @@ def save_plots_as_images(
 
     # Create and save each plot
     plots = {
-        'speed_comparison': viz.create_speed_comparison_plot(
+        "speed_comparison": viz.create_speed_comparison_plot(
             telemetry1, telemetry2, driver1_name, driver2_name, config
         ),
-        'delta_time': viz.create_delta_time_plot(
-            comparison_summary['delta_time'],
-            telemetry1['Distance'].values,
-            driver1_name, driver2_name,
+        "delta_time": viz.create_delta_time_plot(
+            comparison_summary["delta_time"],
+            telemetry1["Distance"].values,
+            driver1_name,
+            driver2_name,
             config,
         ),
-        'segment_comparison': viz.create_segment_comparison_plot(
-            comparison_summary['segment_comparisons'],
-            driver1_name, driver2_name,
+        "segment_comparison": viz.create_segment_comparison_plot(
+            comparison_summary["segment_comparisons"],
+            driver1_name,
+            driver2_name,
             config,
         ),
-        'throttle_brake': viz.create_throttle_brake_plot(
+        "throttle_brake": viz.create_throttle_brake_plot(
             telemetry1, telemetry2, driver1_name, driver2_name, config
         ),
-        'gear': viz.create_gear_plot(
+        "gear": viz.create_gear_plot(telemetry1, telemetry2, driver1_name, driver2_name, config),
+        "acceleration": viz.create_acceleration_plot(
             telemetry1, telemetry2, driver1_name, driver2_name, config
         ),
-        'acceleration': viz.create_acceleration_plot(
-            telemetry1, telemetry2, driver1_name, driver2_name, config
-        ),
-        'track_map': viz.create_track_map(
-            telemetry1, telemetry2, driver1_name, driver2_name, 'Speed', config
+        "track_map": viz.create_track_map(
+            telemetry1, telemetry2, driver1_name, driver2_name, "Speed", config
         ),
     }
 

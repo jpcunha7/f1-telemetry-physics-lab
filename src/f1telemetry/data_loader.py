@@ -105,7 +105,7 @@ def get_lap(
             logger.info(f"Selected fastest lap for {driver}: Lap {lap['LapNumber']}")
         else:
             lap_number = int(lap_selection)
-            lap = driver_laps[driver_laps['LapNumber'] == lap_number].iloc[0]
+            lap = driver_laps[driver_laps["LapNumber"] == lap_number].iloc[0]
             logger.info(f"Selected lap {lap_number} for {driver}")
 
         return lap
@@ -139,7 +139,7 @@ def get_telemetry(lap: Lap) -> pd.DataFrame:
             raise ValueError("Telemetry data is empty")
 
         # Ensure required columns exist
-        required_columns = ['Distance', 'Speed', 'Throttle', 'Brake']
+        required_columns = ["Distance", "Speed", "Throttle", "Brake"]
         missing_columns = [col for col in required_columns if col not in telemetry.columns]
 
         if missing_columns:
@@ -219,8 +219,7 @@ def load_lap_comparison_data(
     telemetry2 = get_telemetry(lap2)
 
     logger.info(
-        f"Comparison data loaded: {driver1} ({lap1_selection}) vs "
-        f"{driver2} ({lap2_selection})"
+        f"Comparison data loaded: {driver1} ({lap1_selection}) vs " f"{driver2} ({lap2_selection})"
     )
 
     return lap1, lap2, telemetry1, telemetry2, session
@@ -237,10 +236,10 @@ def get_session_info(session: Session) -> dict:
         Dictionary with session metadata
     """
     return {
-        "event_name": session.event.get('EventName', 'Unknown'),
-        "location": session.event.get('Location', 'Unknown'),
-        "country": session.event.get('Country', 'Unknown'),
-        "circuit": session.event.get('OfficialEventName', 'Unknown'),
+        "event_name": session.event.get("EventName", "Unknown"),
+        "location": session.event.get("Location", "Unknown"),
+        "country": session.event.get("Country", "Unknown"),
+        "circuit": session.event.get("OfficialEventName", "Unknown"),
         "session_type": session.name,
-        "date": str(session.date) if session.date else 'Unknown',
+        "date": str(session.date) if session.date else "Unknown",
     }

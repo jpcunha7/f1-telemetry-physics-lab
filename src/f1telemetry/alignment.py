@@ -32,15 +32,15 @@ def validate_telemetry(telemetry: pd.DataFrame, name: str = "telemetry") -> None
     if telemetry.empty:
         raise ValueError(f"{name} is empty")
 
-    required_columns = ['Distance', 'Speed']
+    required_columns = ["Distance", "Speed"]
     missing = [col for col in required_columns if col not in telemetry.columns]
     if missing:
         raise ValueError(f"{name} missing required columns: {missing}")
 
-    if telemetry['Distance'].isna().any():
+    if telemetry["Distance"].isna().any():
         raise ValueError(f"{name} has NaN values in Distance column")
 
-    if not telemetry['Distance'].is_monotonic_increasing:
+    if not telemetry["Distance"].is_monotonic_increasing:
         logger.warning(f"{name} Distance is not monotonic increasing, sorting...")
 
 
@@ -86,22 +86,23 @@ def interpolate_telemetry(
         # Default columns to interpolate
         available_columns = telemetry.columns.tolist()
         columns_to_interpolate = [
-            col for col in ['Speed', 'Throttle', 'Brake', 'nGear', 'RPM', 'DRS', 'X', 'Y']
+            col
+            for col in ["Speed", "Throttle", "Brake", "nGear", "RPM", "DRS", "X", "Y"]
             if col in available_columns
         ]
 
     # Ensure Distance is available and clean
-    distances = telemetry['Distance'].values
+    distances = telemetry["Distance"].values
 
     # Remove duplicates and sort by distance
-    df_clean = telemetry[['Distance'] + columns_to_interpolate].copy()
-    df_clean = df_clean.drop_duplicates(subset=['Distance'])
-    df_clean = df_clean.sort_values('Distance')
+    df_clean = telemetry[["Distance"] + columns_to_interpolate].copy()
+    df_clean = df_clean.drop_duplicates(subset=["Distance"])
+    df_clean = df_clean.sort_values("Distance")
 
-    distances = df_clean['Distance'].values
+    distances = df_clean["Distance"].values
 
     # Create interpolated data dictionary
-    interpolated_data = {'Distance': distance_array}
+    interpolated_data = {"Distance": distance_array}
 
     for col in columns_to_interpolate:
         try:
@@ -109,13 +110,13 @@ def interpolate_telemetry(
 
             # Handle NaN values by forward/backward fill before interpolation
             if pd.isna(values).any():
-                values = pd.Series(values).fillna(method='ffill').fillna(method='bfill').values
+                values = pd.Series(values).fillna(method="ffill").fillna(method="bfill").values
 
             # Create interpolation function (linear)
             interp_func = interp1d(
                 distances,
                 values,
-                kind='linear',
+                kind="linear",
                 bounds_error=False,
                 fill_value=(values[0], values[-1]),
             )
@@ -152,10 +153,10 @@ def align_laps(
     validate_telemetry(telemetry2, "telemetry2")
 
     # Determine common distance range
-    min_dist1 = telemetry1['Distance'].min()
-    max_dist1 = telemetry1['Distance'].max()
-    min_dist2 = telemetry2['Distance'].min()
-    max_dist2 = telemetry2['Distance'].max()
+    min_dist1 = telemetry1["Distance"].min()
+    max_dist1 = telemetry1["Distance"].max()
+    min_dist2 = telemetry2["Distance"].min()
+    max_dist2 = telemetry2["Distance"].max()
 
     # Use overlapping distance range
     min_distance = max(min_dist1, min_dist2)
@@ -216,11 +217,11 @@ def compute_delta_time(
         )
 
     # Get speeds in km/h
-    speed1 = telemetry1['Speed'].values
-    speed2 = telemetry2['Speed'].values
+    speed1 = telemetry1["Speed"].values
+    speed2 = telemetry2["Speed"].values
 
     # Get distance deltas
-    distances = telemetry1['Distance'].values
+    distances = telemetry1["Distance"].values
     distance_deltas = np.diff(distances, prepend=distances[0])
 
     # Compute time deltas: dt = dx / v (convert speed to m/s)
@@ -252,8 +253,8 @@ def resample_telemetry(
     Returns:
         Resampled telemetry DataFrame
     """
-    min_dist = telemetry['Distance'].min()
-    max_dist = telemetry['Distance'].max()
+    min_dist = telemetry["Distance"].min()
+    max_dist = telemetry["Distance"].max()
 
     new_distance_array = create_distance_array(min_dist, max_dist, new_resolution)
 

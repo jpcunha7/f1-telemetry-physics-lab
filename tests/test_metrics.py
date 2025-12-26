@@ -21,10 +21,12 @@ def create_mock_telemetry(speed_multiplier: float = 1.0) -> pd.DataFrame:
     distance = np.linspace(0, 1000, 200)
     speed = (200 + 50 * np.sin(distance / 100)) * speed_multiplier
 
-    return pd.DataFrame({
-        'Distance': distance,
-        'Speed': speed,
-    })
+    return pd.DataFrame(
+        {
+            "Distance": distance,
+            "Speed": speed,
+        }
+    )
 
 
 class TestDivideLapIntoSegments:
@@ -63,7 +65,7 @@ class TestComputeSegmentTimes:
     def test_number_of_times_matches_segments(self):
         """Test number of times matches number of segments."""
         telemetry = create_mock_telemetry()
-        distance = telemetry['Distance'].values
+        distance = telemetry["Distance"].values
         segments = divide_lap_into_segments(distance, num_segments=10)
 
         times = compute_segment_times(telemetry, segments)
@@ -73,7 +75,7 @@ class TestComputeSegmentTimes:
     def test_times_are_positive(self):
         """Test all segment times are positive."""
         telemetry = create_mock_telemetry()
-        distance = telemetry['Distance'].values
+        distance = telemetry["Distance"].values
         segments = divide_lap_into_segments(distance, num_segments=5)
 
         times = compute_segment_times(telemetry, segments)
@@ -85,7 +87,7 @@ class TestComputeSegmentTimes:
         tel_slow = create_mock_telemetry(speed_multiplier=0.8)
         tel_fast = create_mock_telemetry(speed_multiplier=1.2)
 
-        distance = tel_slow['Distance'].values
+        distance = tel_slow["Distance"].values
         segments = divide_lap_into_segments(distance, num_segments=5)
 
         times_slow = compute_segment_times(tel_slow, segments)
@@ -117,11 +119,11 @@ class TestCompareSegments:
         comparisons = compare_segments(tel1, tel2, config)
 
         comp = comparisons[0]
-        assert hasattr(comp, 'segment_num')
-        assert hasattr(comp, 'driver1_time')
-        assert hasattr(comp, 'driver2_time')
-        assert hasattr(comp, 'time_delta')
-        assert hasattr(comp, 'winner')
+        assert hasattr(comp, "segment_num")
+        assert hasattr(comp, "driver1_time")
+        assert hasattr(comp, "driver2_time")
+        assert hasattr(comp, "time_delta")
+        assert hasattr(comp, "winner")
 
     def test_winner_determination(self):
         """Test winner is correctly determined."""

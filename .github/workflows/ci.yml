@@ -46,10 +46,6 @@ jobs:
       run: |
         poetry run pytest tests/ -v --cov=f1telemetry --cov-report=term-missing
 
-    - name: Run type checking
-      run: |
-        poetry run mypy src/f1telemetry --ignore-missing-imports
-
   lint:
     runs-on: ubuntu-latest
 

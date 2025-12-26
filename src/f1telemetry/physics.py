@@ -73,8 +73,8 @@ def compute_acceleration(
     Returns:
         Array of acceleration in m/s²
     """
-    speed_kmh = telemetry['Speed'].values
-    distance = telemetry['Distance'].values
+    speed_kmh = telemetry["Speed"].values
+    distance = telemetry["Distance"].values
 
     # Convert speed to m/s
     speed_ms = speed_kmh / 3.6
@@ -139,13 +139,13 @@ def detect_braking_zones(
     Returns:
         List of BrakingZone objects
     """
-    if 'Brake' not in telemetry.columns:
+    if "Brake" not in telemetry.columns:
         logger.warning("No Brake column in telemetry, cannot detect braking zones")
         return []
 
-    brake = telemetry['Brake'].values
-    speed = telemetry['Speed'].values
-    distance = telemetry['Distance'].values
+    brake = telemetry["Brake"].values
+    speed = telemetry["Speed"].values
+    distance = telemetry["Distance"].values
 
     # Compute acceleration if not provided
     if acceleration is None:
@@ -217,8 +217,8 @@ def detect_corners(
     Returns:
         List of Corner objects
     """
-    speed = telemetry['Speed'].values
-    distance = telemetry['Distance'].values
+    speed = telemetry["Speed"].values
+    distance = telemetry["Distance"].values
 
     # Smooth speed for peak detection
     speed_smooth = smooth_signal(speed, config.smoothing_window, config.smoothing_polyorder)
@@ -237,8 +237,7 @@ def detect_corners(
 
     # Filter by speed threshold
     minima_indices = [
-        idx for idx in minima_indices
-        if speed_smooth[idx] < config.speed_threshold_corner
+        idx for idx in minima_indices if speed_smooth[idx] < config.speed_threshold_corner
     ]
 
     corners = []
@@ -251,7 +250,9 @@ def detect_corners(
         exit_speed = float(speed[idx + lookforward]) if lookforward > 0 else float(speed[idx])
 
         # Average acceleration in exit phase
-        exit_accel = float(np.mean(acceleration[idx:idx + lookforward])) if lookforward > 5 else 0.0
+        exit_accel = (
+            float(np.mean(acceleration[idx : idx + lookforward])) if lookforward > 5 else 0.0
+        )
 
         corner = Corner(
             idx=int(idx),
@@ -287,6 +288,6 @@ def add_physics_channels(
     telemetry = telemetry.copy()
 
     # Compute acceleration
-    telemetry['Acceleration'] = compute_acceleration(telemetry, config)
+    telemetry["Acceleration"] = compute_acceleration(telemetry, config)
 
     return telemetry

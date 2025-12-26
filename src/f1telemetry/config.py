@@ -114,9 +114,7 @@ def validate_session_type(session: str) -> SessionType:
     valid_sessions: list[SessionType] = ["FP1", "FP2", "FP3", "Q", "S", "R"]
 
     if session_upper not in valid_sessions:
-        raise ValueError(
-            f"Invalid session type: {session}. Must be one of {valid_sessions}"
-        )
+        raise ValueError(f"Invalid session type: {session}. Must be one of {valid_sessions}")
 
     return session_upper  # type: ignore
 
