@@ -25,10 +25,7 @@ def set_page_config(title: str, icon: str = "🏎️", layout: str = "wide"):
         layout: Page layout ("wide" or "centered")
     """
     st.set_page_config(
-        page_title=title,
-        page_icon=icon,
-        layout=layout,
-        initial_sidebar_state="expanded"
+        page_title=title, page_icon=icon, layout=layout, initial_sidebar_state="expanded"
     )
     load_css()
 
@@ -58,4 +55,4 @@ def create_data_status_panel(session_info: dict):
     for key, value in session_info.items():
         st.markdown(f"<p><strong>{key}:</strong> {value}</p>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)

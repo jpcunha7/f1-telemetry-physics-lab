@@ -7,7 +7,7 @@ Author: João Pedro Cunha
 License: MIT
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __author__ = "João Pedro Cunha"
 
 from f1telemetry import (
@@ -22,6 +22,9 @@ from f1telemetry import (
     delta_decomp,
     gg_diagram,
     multilap,
+    braking_zones,
+    race_pace,
+    style_profile,
 )
 
 __all__ = [
@@ -36,4 +39,7 @@ __all__ = [
     "delta_decomp",
     "gg_diagram",
     "multilap",
+    "braking_zones",
+    "race_pace",
+    "style_profile",
 ]

@@ -46,9 +46,9 @@ class Config:
     minisector_variance_threshold: float = 0.05  # seconds, threshold for identifying mistake zones
 
     # Corner detection
-    corner_min_speed_threshold: float = 100.0  # km/h, maximum speed to consider as corner
-    corner_prominence: float = 15.0  # km/h, minimum speed drop to detect corner
-    corner_min_distance: int = 30  # samples, minimum distance between corners
+    corner_min_speed_threshold: float = 250.0  # km/h, maximum speed to consider as corner (increased to detect fast corners)
+    corner_prominence: float = 10.0  # km/h, minimum speed drop to detect corner (decreased to detect more corners)
+    corner_min_distance: int = 20  # samples, minimum distance between corners (decreased to allow closer corners)
 
     # G-G diagram and acceleration
     max_lateral_g: float = 6.0  # maximum lateral g-force for clipping

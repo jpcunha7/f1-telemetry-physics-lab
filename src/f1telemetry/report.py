@@ -15,7 +15,22 @@ import pandas as pd
 from jinja2 import Template
 
 from f1telemetry.config import Config, DEFAULT_CONFIG
-from f1telemetry import physics, metrics, viz
+from f1telemetry import viz
+
+# Try to import components (may not be available in all contexts)
+try:
+    import sys
+    from pathlib import Path as P
+
+    # Add app to path
+    app_path = P(__file__).parent.parent.parent / "app"
+    if app_path.exists() and str(app_path) not in sys.path:
+        sys.path.insert(0, str(app_path))
+    from components.insight_summary import generate_insight_summary
+
+    INSIGHTS_AVAILABLE = True
+except ImportError:
+    INSIGHTS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +121,39 @@ HTML_TEMPLATE = """
             margin-top: 0;
             color: #ff6b6b;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #1a1a1a;
+        }
+        th {
+            background-color: #2d2d2d;
+            color: #1e90ff;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #ff1e1e;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
+        }
+        tr:hover {
+            background-color: #252525;
+        }
+        .insights h4 {
+            color: #1e90ff;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .insights ol, .insights ul {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        .insights li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -134,10 +182,58 @@ HTML_TEMPLATE = """
     </div>
 
     <div class="insights">
-        <h3>📊 Key Insights</h3>
+        <h3>📊 Insight Summary</h3>
+
+        {% if enhanced_insights %}
+        <div class="insight-item">
+            <strong>Overall:</strong> {{ enhanced_insights.faster_driver }} is <strong>{{ "%.3f"|format(enhanced_insights.total_delta|abs) }}s faster</strong>
+            ({{ "%+.3f"|format(enhanced_insights.total_delta) }}s)
+        </div>
+
+        {% if enhanced_insights.top_locations %}
+        <h4>Top 3 Locations Where Time is Won/Lost:</h4>
+        <ol>
+        {% for loc in enhanced_insights.top_locations %}
+            <li>Minisector {{ loc.minisector_id }} ({{ loc.distance_range }}):
+                {{ "%+.3f"|format(loc.delta) }}s favoring <strong>{{ loc.favoring }}</strong>
+            </li>
+        {% endfor %}
+        </ol>
+        {% endif %}
+
+        {% if enhanced_insights.breakdown %}
+        <h4>Performance Breakdown (by phase):</h4>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Braking</div>
+                <div class="info-value">{{ "%+.3f"|format(enhanced_insights.breakdown.braking) }}s</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Corner</div>
+                <div class="info-value">{{ "%+.3f"|format(enhanced_insights.breakdown.corner) }}s</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Traction</div>
+                <div class="info-value">{{ "%+.3f"|format(enhanced_insights.breakdown.traction) }}s</div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if enhanced_insights.key_findings %}
+        <h4>Key Findings:</h4>
+        <ul>
+        {% for finding in enhanced_insights.key_findings %}
+            <li>{{ finding }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% else %}
+        <!-- Fallback to basic insights -->
         {% for insight in insights %}
         <div class="insight-item">{{ insight }}</div>
         {% endfor %}
+        {% endif %}
     </div>
 
     <h2>Speed Comparison</h2>
@@ -182,49 +278,62 @@ HTML_TEMPLATE = """
 
 
 def generate_html_report(
-    lap1: object,
-    lap2: object,
-    telemetry1: pd.DataFrame,
-    telemetry2: pd.DataFrame,
     session_info: dict,
+    comparison_summary: dict,
     driver1_name: str,
     driver2_name: str,
+    telemetry1: pd.DataFrame,
+    telemetry2: pd.DataFrame,
     config: Config = DEFAULT_CONFIG,
+    minisector_data: Optional[pd.DataFrame] = None,
+    corners1: Optional[list] = None,
+    corners2: Optional[list] = None,
+    decompositions: Optional[list] = None,
     output_path: Optional[Path] = None,
+    # Legacy parameters for backward compatibility
+    lap1: object = None,
+    lap2: object = None,
 ) -> str:
     """
     Generate HTML report for lap comparison.
 
     Args:
-        lap1: FastF1 Lap object for driver 1
-        lap2: FastF1 Lap object for driver 2
-        telemetry1: Aligned telemetry for driver 1
-        telemetry2: Aligned telemetry for driver 2
         session_info: Session metadata dictionary
+        comparison_summary: Comparison summary from metrics
         driver1_name: Name/code for driver 1
         driver2_name: Name/code for driver 2
+        telemetry1: Aligned telemetry for driver 1 (with physics channels)
+        telemetry2: Aligned telemetry for driver 2 (with physics channels)
         config: Configuration
+        minisector_data: Optional minisector comparison data
+        corners1: Optional corner data for driver 1
+        corners2: Optional corner data for driver 2
+        decompositions: Optional corner decompositions
         output_path: Optional path to save report
+        lap1: Legacy parameter (deprecated)
+        lap2: Legacy parameter (deprecated)
 
     Returns:
         HTML report string
     """
     logger.info("Generating HTML report...")
 
-    # Add physics channels
-    telemetry1 = physics.add_physics_channels(telemetry1, config)
-    telemetry2 = physics.add_physics_channels(telemetry2, config)
-
-    # Compute metrics
-    comparison_summary = metrics.create_comparison_summary(
-        lap1,
-        lap2,
-        telemetry1,
-        telemetry2,
-        driver1_name,
-        driver2_name,
-        config,
-    )
+    # Generate enhanced insights if components are available
+    enhanced_insights = None
+    if INSIGHTS_AVAILABLE and minisector_data is not None:
+        try:
+            enhanced_insights = generate_insight_summary(
+                comparison_summary,
+                minisector_data,
+                corners1,
+                corners2,
+                decompositions,
+                driver1_name,
+                driver2_name,
+            )
+        except Exception as e:
+            logger.warning(f"Could not generate enhanced insights: {e}")
+            enhanced_insights = None
 
     # Create plots
     plot_speed = viz.create_speed_comparison_plot(
@@ -269,7 +378,8 @@ def generate_html_report(
         driver1_name=driver1_name,
         driver2_name=driver2_name,
         final_delta=comparison_summary["final_delta"],
-        insights=comparison_summary["insights"],
+        insights=comparison_summary.get("insights", []),
+        enhanced_insights=enhanced_insights,
         plot_speed=plot_speed,
         plot_delta=plot_delta,
         plot_segments=plot_segments,

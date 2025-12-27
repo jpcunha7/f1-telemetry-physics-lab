@@ -155,22 +155,16 @@ def compute_minisector_deltas(
     )
 
 
-def get_top_minisector_gains(
-    minisector_data: MinisectorData, n: int = 10
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+def minisector_data_to_dataframe(minisector_data: MinisectorData) -> pd.DataFrame:
     """
-    Get top N minisectors with biggest gains and losses.
+    Convert MinisectorData object to pandas DataFrame.
 
     Args:
         minisector_data: MinisectorData object from compute_minisector_deltas
-        n: Number of top gains/losses to return
 
     Returns:
-        Tuple of (top_gains_df, top_losses_df) where:
-        - top_gains_df: DataFrame of minisectors where driver1 gained most (negative delta)
-        - top_losses_df: DataFrame of minisectors where driver1 lost most (positive delta)
+        DataFrame with minisector analysis results
     """
-    # Create full dataframe
     df = pd.DataFrame(
         {
             "Minisector": minisector_data.minisector_id,
@@ -187,6 +181,30 @@ def get_top_minisector_gains(
         df["Throttle_Driver1"] = minisector_data.throttle_avg_driver1
         df["Throttle_Driver2"] = minisector_data.throttle_avg_driver2
 
+    return df
+
+
+def get_top_minisector_gains(
+    minisector_data, n: int = 10
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Get top N minisectors with biggest gains and losses.
+
+    Args:
+        minisector_data: MinisectorData object or DataFrame from compute_minisector_deltas
+        n: Number of top gains/losses to return
+
+    Returns:
+        Tuple of (top_gains_df, top_losses_df) where:
+        - top_gains_df: DataFrame of minisectors where driver1 gained most (negative delta)
+        - top_losses_df: DataFrame of minisectors where driver1 lost most (positive delta)
+    """
+    # Convert to dataframe if needed
+    if isinstance(minisector_data, MinisectorData):
+        df = minisector_data_to_dataframe(minisector_data)
+    else:
+        df = minisector_data
+
     # Sort by time delta
     df_sorted = df.sort_values("Time_Delta")
 
@@ -202,7 +220,7 @@ def get_top_minisector_gains(
 
 
 def create_minisector_bar_chart(
-    minisector_data: MinisectorData,
+    minisector_data,
     driver1_name: str,
     driver2_name: str,
     config: Config = DEFAULT_CONFIG,
@@ -211,7 +229,7 @@ def create_minisector_bar_chart(
     Create bar chart visualization of minisector deltas.
 
     Args:
-        minisector_data: MinisectorData object
+        minisector_data: MinisectorData object or DataFrame
         driver1_name: Name/code for driver 1
         driver2_name: Name/code for driver 2
         config: Configuration for plot styling
@@ -219,15 +237,23 @@ def create_minisector_bar_chart(
     Returns:
         Plotly figure with bar chart
     """
+    # Handle both MinisectorData and DataFrame
+    if isinstance(minisector_data, pd.DataFrame):
+        minisector_ids = minisector_data["Minisector"].values
+        time_deltas = minisector_data["Time_Delta"].values
+    else:
+        minisector_ids = minisector_data.minisector_id
+        time_deltas = minisector_data.time_delta
+
     # Color bars based on who is faster
-    colors = ["#1E90FF" if delta < 0 else "#FF1E1E" for delta in minisector_data.time_delta]
+    colors = ["#1E90FF" if delta < 0 else "#FF1E1E" for delta in time_deltas]
 
     fig = go.Figure()
 
     fig.add_trace(
         go.Bar(
-            x=minisector_data.minisector_id,
-            y=minisector_data.time_delta,
+            x=minisector_ids,
+            y=time_deltas,
             marker_color=colors,
             name="Time Delta",
             hovertemplate=(
@@ -240,10 +266,18 @@ def create_minisector_bar_chart(
             ),
             customdata=np.column_stack(
                 [
-                    minisector_data.distance_start,
-                    minisector_data.distance_end,
-                    minisector_data.speed_avg_driver1,
-                    minisector_data.speed_avg_driver2,
+                    minisector_data["Distance_Start"].values
+                    if isinstance(minisector_data, pd.DataFrame)
+                    else minisector_data.distance_start,
+                    minisector_data["Distance_End"].values
+                    if isinstance(minisector_data, pd.DataFrame)
+                    else minisector_data.distance_end,
+                    minisector_data["Speed_Driver1"].values
+                    if isinstance(minisector_data, pd.DataFrame)
+                    else minisector_data.speed_avg_driver1,
+                    minisector_data["Speed_Driver2"].values
+                    if isinstance(minisector_data, pd.DataFrame)
+                    else minisector_data.speed_avg_driver2,
                 ]
             ),
         )
@@ -279,7 +313,7 @@ def create_minisector_bar_chart(
 
 def create_minisector_track_map(
     telemetry: pd.DataFrame,
-    minisector_data: MinisectorData,
+    minisector_data,
     driver_name: str,
     config: Config = DEFAULT_CONFIG,
 ) -> go.Figure:
@@ -291,7 +325,7 @@ def create_minisector_track_map(
 
     Args:
         telemetry: Telemetry DataFrame with X, Y, Distance columns
-        minisector_data: MinisectorData object with delta information
+        minisector_data: MinisectorData object or DataFrame with delta information
         driver_name: Name of driver being analyzed
         config: Configuration for plot styling
 
@@ -304,16 +338,24 @@ def create_minisector_track_map(
     if "X" not in telemetry.columns or "Y" not in telemetry.columns:
         raise ValueError("Position data (X, Y) not available in telemetry")
 
+    # Handle both MinisectorData and DataFrame
+    if isinstance(minisector_data, pd.DataFrame):
+        distance_starts = minisector_data["Distance_Start"].values
+        time_deltas = minisector_data["Time_Delta"].values
+    else:
+        distance_starts = minisector_data.distance_start
+        time_deltas = minisector_data.time_delta
+
     # Assign each telemetry point to a minisector
     distance = telemetry["Distance"].values
-    minisector_assignment = np.digitize(distance, minisector_data.distance_start, right=False) - 1
-    minisector_assignment = np.clip(minisector_assignment, 0, len(minisector_data.time_delta) - 1)
+    minisector_assignment = np.digitize(distance, distance_starts, right=False) - 1
+    minisector_assignment = np.clip(minisector_assignment, 0, len(time_deltas) - 1)
 
     # Map time delta to each point
-    delta_at_point = minisector_data.time_delta[minisector_assignment]
+    delta_at_point = time_deltas[minisector_assignment]
 
     # Create color scale: blue for gains, red for losses
-    max_abs_delta = np.max(np.abs(minisector_data.time_delta))
+    max_abs_delta = np.max(np.abs(time_deltas))
     colorscale = [
         [0.0, "#0000FF"],  # Strong blue (big gain)
         [0.25, "#4169E1"],  # Medium blue

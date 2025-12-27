@@ -114,8 +114,8 @@ def detect_corners(
     # Use prominence to filter out small speed variations
     minima_indices, properties = find_peaks(
         -speed_smooth,  # Invert for minima detection
-        prominence=15,  # Require at least 15 km/h drop from surrounding speeds
-        distance=30,  # Minimum 30 samples between corners
+        prominence=config.corner_prominence,  # Require drop from surrounding speeds
+        distance=config.corner_min_distance,  # Minimum samples between corners
         height=-min_speed_threshold,  # Maximum speed at apex
     )
 
