@@ -168,11 +168,11 @@ HTML_TEMPLATE = """
 
     <div class="info-grid">
         <div class="info-item">
-            <div class="info-label">Driver 1</div>
+            <div class="info-label">Primary Driver</div>
             <div class="info-value" style="color: #ff1e1e;">{{ driver1_name }}</div>
         </div>
         <div class="info-item">
-            <div class="info-label">Driver 2</div>
+            <div class="info-label">Comparison Driver</div>
             <div class="info-value" style="color: #1e90ff;">{{ driver2_name }}</div>
         </div>
         <div class="info-item">

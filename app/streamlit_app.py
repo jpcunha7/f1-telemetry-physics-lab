@@ -156,7 +156,7 @@ def sidebar_inputs():
 
     with col1:
         driver1_display = st.selectbox(
-            "Driver 1",
+            "Primary Driver",
             options=driver_displays,
             index=0,  # First driver by default
             key="driver1_select",
@@ -164,20 +164,20 @@ def sidebar_inputs():
         driver1 = driver_codes[driver1_display]
 
         lap1_type = st.selectbox(
-            "Lap 1",
+            f"{driver1} Lap",
             options=["fastest", "custom"],
             index=0,
             key="lap1_type",
         )
 
         if lap1_type == "custom":
-            lap1 = str(st.number_input("Lap 1 Number", min_value=1, value=1, step=1))
+            lap1 = str(st.number_input(f"{driver1} Lap Number", min_value=1, value=1, step=1))
         else:
             lap1 = "fastest"
 
     with col2:
         driver2_display = st.selectbox(
-            "Driver 2",
+            "Comparison Driver",
             options=driver_displays,
             index=min(2, len(driver_displays) - 1),  # Third driver by default if available
             key="driver2_select",
@@ -185,14 +185,14 @@ def sidebar_inputs():
         driver2 = driver_codes[driver2_display]
 
         lap2_type = st.selectbox(
-            "Lap 2",
+            f"{driver2} Lap",
             options=["fastest", "custom"],
             index=0,
             key="lap2_type",
         )
 
         if lap2_type == "custom":
-            lap2 = str(st.number_input("Lap 2 Number", min_value=1, value=1, step=1))
+            lap2 = str(st.number_input(f"{driver2} Lap Number", min_value=1, value=1, step=1))
         else:
             lap2 = "fastest"
 
@@ -253,10 +253,10 @@ def load_data(params):
                     minisector_data_obj
                 )
 
-            # Detect corners
+            # Detect corners using circuit info when available
             with st.spinner("Detecting corners..."):
-                corners1 = corners_module.detect_corners(tel1, config=config)
-                corners2 = corners_module.detect_corners(tel2, config=config)
+                corners1 = corners_module.get_circuit_corners(session, tel1, config=config)
+                corners2 = corners_module.get_circuit_corners(session, tel2, config=config)
 
             # Corner decomposition
             with st.spinner("Analyzing delta decomposition..."):

@@ -4,11 +4,14 @@ Corner detection and analysis module for F1 Telemetry Physics Lab.
 Detects corners from telemetry and creates detailed corner catalogs with
 entry speed, minimum speed, exit speed, braking distances, and performance metrics.
 
+Uses FastF1 circuit information when available to provide accurate corner data for all tracks.
+
 Author: João Pedro Cunha
 """
 
 import logging
 from dataclasses import dataclass
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -58,6 +61,107 @@ class Corner:
     peak_deceleration: float
     throttle_reapply_distance: float
     corner_type: str
+
+
+def get_circuit_corners(session, telemetry: pd.DataFrame, config: Config = DEFAULT_CONFIG) -> list[Corner]:
+    """
+    Get corners from FastF1 circuit information and match them with telemetry data.
+
+    This provides accurate corner data for all corners on the circuit, using the
+    circuit's official corner information from FastF1.
+
+    Args:
+        session: FastF1 Session object
+        telemetry: Telemetry DataFrame with Speed, Distance, Brake, Throttle
+        config: Configuration object
+
+    Returns:
+        List of Corner objects with telemetry-based metrics for each circuit corner
+    """
+    try:
+        # Get circuit info from session
+        if not hasattr(session, 'circuit_info') or session.circuit_info is None:
+            logger.warning("Circuit info not available, falling back to telemetry-based detection")
+            return detect_corners(telemetry, config=config)
+
+        circuit_info = session.circuit_info
+
+        # Check if corners data is available
+        if not hasattr(circuit_info, 'corners') or circuit_info.corners is None or circuit_info.corners.empty:
+            logger.warning("Circuit corners data not available, falling back to telemetry-based detection")
+            return detect_corners(telemetry, config=config)
+
+        corners_df = circuit_info.corners
+        logger.info(f"Found {len(corners_df)} corners from circuit info")
+
+        # Extract required data from telemetry
+        speed = telemetry["Speed"].values
+        distance = telemetry["Distance"].values
+
+        has_brake = "Brake" in telemetry.columns
+        has_throttle = "Throttle" in telemetry.columns
+        has_accel = "Acceleration" in telemetry.columns
+
+        brake = telemetry["Brake"].values if has_brake else np.zeros_like(speed)
+        throttle = telemetry["Throttle"].values if has_throttle else np.zeros_like(speed)
+        acceleration = telemetry["Acceleration"].values if has_accel else np.zeros_like(speed)
+
+        corners = []
+
+        # Process each corner from circuit info
+        for idx, corner_row in corners_df.iterrows():
+            corner_num = int(corner_row['Number'])
+            corner_distance = corner_row.get('Distance', None)
+
+            # If Distance is not available in circuit info, try to find corner by position
+            if pd.isna(corner_distance) or corner_distance is None:
+                # Skip corners without distance information
+                logger.debug(f"Corner {corner_num} has no distance information, skipping")
+                continue
+
+            # Find closest telemetry point to corner distance
+            apex_idx = np.argmin(np.abs(distance - corner_distance))
+
+            # Ensure we're at a local minimum in speed (apex)
+            # Search within a window around the distance-based position
+            search_window = 50  # samples
+            start_idx = max(0, apex_idx - search_window)
+            end_idx = min(len(speed), apex_idx + search_window)
+
+            # Find local minimum speed in this window
+            window_speeds = speed[start_idx:end_idx]
+            if len(window_speeds) > 0:
+                min_speed_offset = np.argmin(window_speeds)
+                apex_idx = start_idx + min_speed_offset
+
+            try:
+                # Analyze corner characteristics
+                corner = _analyze_corner(
+                    corner_id=corner_num,
+                    apex_idx=apex_idx,
+                    distance=distance,
+                    speed=speed,
+                    brake=brake,
+                    throttle=throttle,
+                    acceleration=acceleration,
+                    config=config,
+                )
+                corners.append(corner)
+
+            except Exception as e:
+                logger.warning(f"Failed to analyze corner {corner_num}: {e}")
+                continue
+
+        # Sort corners by corner_id to maintain proper order
+        corners.sort(key=lambda c: c.corner_id)
+
+        logger.info(f"Successfully analyzed {len(corners)} corners from circuit info")
+        return corners
+
+    except Exception as e:
+        logger.error(f"Error getting circuit corners: {e}", exc_info=True)
+        logger.warning("Falling back to telemetry-based corner detection")
+        return detect_corners(telemetry, config=config)
 
 
 def detect_corners(
