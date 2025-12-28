@@ -63,7 +63,9 @@ class Corner:
     corner_type: str
 
 
-def get_circuit_corners(session, telemetry: pd.DataFrame, config: Config = DEFAULT_CONFIG) -> list[Corner]:
+def get_circuit_corners(
+    session, telemetry: pd.DataFrame, config: Config = DEFAULT_CONFIG
+) -> list[Corner]:
     """
     Get corners from FastF1 circuit information and match them with telemetry data.
 
@@ -87,8 +89,14 @@ def get_circuit_corners(session, telemetry: pd.DataFrame, config: Config = DEFAU
             return detect_corners(telemetry, config=config)
 
         # Check if corners data is available
-        if not hasattr(circuit_info, 'corners') or circuit_info.corners is None or circuit_info.corners.empty:
-            logger.warning("Circuit corners data not available, falling back to telemetry-based detection")
+        if (
+            not hasattr(circuit_info, "corners")
+            or circuit_info.corners is None
+            or circuit_info.corners.empty
+        ):
+            logger.warning(
+                "Circuit corners data not available, falling back to telemetry-based detection"
+            )
             return detect_corners(telemetry, config=config)
 
         corners_df = circuit_info.corners
@@ -110,8 +118,8 @@ def get_circuit_corners(session, telemetry: pd.DataFrame, config: Config = DEFAU
 
         # Process each corner from circuit info
         for idx, corner_row in corners_df.iterrows():
-            corner_num = int(corner_row['Number'])
-            corner_distance = corner_row.get('Distance', None)
+            corner_num = int(corner_row["Number"])
+            corner_distance = corner_row.get("Distance", None)
 
             # If Distance is not available in circuit info, try to find corner by position
             if pd.isna(corner_distance) or corner_distance is None:

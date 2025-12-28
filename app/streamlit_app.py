@@ -60,48 +60,49 @@ def get_available_drivers(year: int, event: str, session_type: str):
     try:
         # Try to load session to get drivers
         import fastf1
+
         session = fastf1.get_session(year, event, session_type)
         session.load()
 
         # Get unique drivers
-        if hasattr(session, 'drivers') and session.drivers is not None:
+        if hasattr(session, "drivers") and session.drivers is not None:
             drivers = session.drivers
             # Get driver info
             driver_info = []
             for driver_code in drivers:
                 try:
                     driver_data = session.get_driver(driver_code)
-                    if driver_data is not None and 'Abbreviation' in driver_data:
+                    if driver_data is not None and "Abbreviation" in driver_data:
                         full_name = f"{driver_data.get('FirstName', '')} {driver_data.get('LastName', '')}".strip()
                         if not full_name:
                             full_name = driver_code
-                        driver_info.append({
-                            'code': driver_code,
-                            'full_name': full_name,
-                            'display': f"{full_name} ({driver_code})"
-                        })
+                        driver_info.append(
+                            {
+                                "code": driver_code,
+                                "full_name": full_name,
+                                "display": f"{full_name} ({driver_code})",
+                            }
+                        )
                 except:
-                    driver_info.append({
-                        'code': driver_code,
-                        'full_name': driver_code,
-                        'display': driver_code
-                    })
+                    driver_info.append(
+                        {"code": driver_code, "full_name": driver_code, "display": driver_code}
+                    )
             return driver_info
     except:
         pass
 
     # Fallback to common 2024 drivers if we can't load
     return [
-        {'code': 'VER', 'full_name': 'Max Verstappen', 'display': 'Max Verstappen (VER)'},
-        {'code': 'PER', 'full_name': 'Sergio Perez', 'display': 'Sergio Perez (PER)'},
-        {'code': 'LEC', 'full_name': 'Charles Leclerc', 'display': 'Charles Leclerc (LEC)'},
-        {'code': 'SAI', 'full_name': 'Carlos Sainz', 'display': 'Carlos Sainz (SAI)'},
-        {'code': 'HAM', 'full_name': 'Lewis Hamilton', 'display': 'Lewis Hamilton (HAM)'},
-        {'code': 'RUS', 'full_name': 'George Russell', 'display': 'George Russell (RUS)'},
-        {'code': 'NOR', 'full_name': 'Lando Norris', 'display': 'Lando Norris (NOR)'},
-        {'code': 'PIA', 'full_name': 'Oscar Piastri', 'display': 'Oscar Piastri (PIA)'},
-        {'code': 'ALO', 'full_name': 'Fernando Alonso', 'display': 'Fernando Alonso (ALO)'},
-        {'code': 'STR', 'full_name': 'Lance Stroll', 'display': 'Lance Stroll (STR)'},
+        {"code": "VER", "full_name": "Max Verstappen", "display": "Max Verstappen (VER)"},
+        {"code": "PER", "full_name": "Sergio Perez", "display": "Sergio Perez (PER)"},
+        {"code": "LEC", "full_name": "Charles Leclerc", "display": "Charles Leclerc (LEC)"},
+        {"code": "SAI", "full_name": "Carlos Sainz", "display": "Carlos Sainz (SAI)"},
+        {"code": "HAM", "full_name": "Lewis Hamilton", "display": "Lewis Hamilton (HAM)"},
+        {"code": "RUS", "full_name": "George Russell", "display": "George Russell (RUS)"},
+        {"code": "NOR", "full_name": "Lando Norris", "display": "Lando Norris (NOR)"},
+        {"code": "PIA", "full_name": "Oscar Piastri", "display": "Oscar Piastri (PIA)"},
+        {"code": "ALO", "full_name": "Fernando Alonso", "display": "Fernando Alonso (ALO)"},
+        {"code": "STR", "full_name": "Lance Stroll", "display": "Lance Stroll (STR)"},
     ]
 
 
@@ -145,54 +146,78 @@ def sidebar_inputs():
     st.sidebar.subheader("Driver Selection")
 
     # Get available drivers (use cached fallback for initial render)
-    if 'driver_list' not in st.session_state:
+    if "driver_list" not in st.session_state:
         st.session_state.driver_list = get_available_drivers(year, event, session_type)
 
     driver_list = st.session_state.driver_list
-    driver_displays = [d['display'] for d in driver_list]
-    driver_codes = {d['display']: d['code'] for d in driver_list}
+    driver_displays = [d["display"] for d in driver_list]
+    driver_codes = {d["display"]: d["code"] for d in driver_list}
 
     col1, col2 = st.sidebar.columns(2)
 
     with col1:
+        st.markdown("**Primary Driver**")
         driver1_display = st.selectbox(
-            "Primary Driver",
+            "Driver",
             options=driver_displays,
             index=0,  # First driver by default
             key="driver1_select",
+            label_visibility="collapsed",
         )
         driver1 = driver_codes[driver1_display]
 
         lap1_type = st.selectbox(
-            f"{driver1} Lap",
+            "Lap Type",
             options=["fastest", "custom"],
             index=0,
             key="lap1_type",
+            label_visibility="collapsed",
         )
 
         if lap1_type == "custom":
-            lap1 = str(st.number_input(f"{driver1} Lap Number", min_value=1, value=1, step=1))
+            lap1 = str(
+                st.number_input(
+                    "Lap Number",
+                    min_value=1,
+                    value=1,
+                    step=1,
+                    key="lap1_num",
+                    label_visibility="collapsed",
+                )
+            )
         else:
             lap1 = "fastest"
 
     with col2:
+        st.markdown("**Comparison Driver**")
         driver2_display = st.selectbox(
-            "Comparison Driver",
+            "Driver",
             options=driver_displays,
             index=min(2, len(driver_displays) - 1),  # Third driver by default if available
             key="driver2_select",
+            label_visibility="collapsed",
         )
         driver2 = driver_codes[driver2_display]
 
         lap2_type = st.selectbox(
-            f"{driver2} Lap",
+            "Lap Type",
             options=["fastest", "custom"],
             index=0,
             key="lap2_type",
+            label_visibility="collapsed",
         )
 
         if lap2_type == "custom":
-            lap2 = str(st.number_input(f"{driver2} Lap Number", min_value=1, value=1, step=1))
+            lap2 = str(
+                st.number_input(
+                    "Lap Number",
+                    min_value=1,
+                    value=1,
+                    step=1,
+                    key="lap2_num",
+                    label_visibility="collapsed",
+                )
+            )
         else:
             lap2 = "fastest"
 
@@ -249,9 +274,7 @@ def load_data(params):
                     tel1, tel2, config.num_minisectors, config
                 )
                 # Convert to DataFrame for compatibility with components
-                minisector_data = minisectors.minisector_data_to_dataframe(
-                    minisector_data_obj
-                )
+                minisector_data = minisectors.minisector_data_to_dataframe(minisector_data_obj)
 
             # Detect corners using circuit info when available
             with st.spinner("Detecting corners..."):
@@ -360,11 +383,11 @@ def page_overview():
     # Lap times in proper motor racing format
     col1, col2 = st.columns(2)
     with col1:
-        lap1_time = format_lap_time(st.session_state.lap1['LapTime'])
+        lap1_time = format_lap_time(st.session_state.lap1["LapTime"])
         st.metric(f"{st.session_state.driver1_name} Lap Time", lap1_time)
 
     with col2:
-        lap2_time = format_lap_time(st.session_state.lap2['LapTime'])
+        lap2_time = format_lap_time(st.session_state.lap2["LapTime"])
         st.metric(f"{st.session_state.driver2_name} Lap Time", lap2_time)
 
     st.markdown("---")
@@ -430,56 +453,74 @@ def page_lap_compare():
             fig_anim = go.Figure()
 
             # Add track outline
-            fig_anim.add_trace(go.Scatter(
-                x=tel1["X"],
-                y=tel1["Y"],
-                mode="lines",
-                line=dict(color="gray", width=2),
-                name="Track",
-                showlegend=True,
-            ))
+            fig_anim.add_trace(
+                go.Scatter(
+                    x=tel1["X"],
+                    y=tel1["Y"],
+                    mode="lines",
+                    line=dict(color="gray", width=2),
+                    name="Track",
+                    showlegend=True,
+                )
+            )
 
             # Add both cars as initial points
-            fig_anim.add_trace(go.Scatter(
-                x=[tel1["X"].iloc[0]],
-                y=[tel1["Y"].iloc[0]],
-                mode="markers",
-                marker=dict(size=15, color=st.session_state.config.primary_color),
-                name=st.session_state.driver1_name,
-            ))
+            fig_anim.add_trace(
+                go.Scatter(
+                    x=[tel1["X"].iloc[0]],
+                    y=[tel1["Y"].iloc[0]],
+                    mode="markers",
+                    marker=dict(size=15, color=st.session_state.config.primary_color),
+                    name=st.session_state.driver1_name,
+                )
+            )
 
-            fig_anim.add_trace(go.Scatter(
-                x=[tel2["X"].iloc[0]],
-                y=[tel2["Y"].iloc[0]],
-                mode="markers",
-                marker=dict(size=15, color=st.session_state.config.secondary_color),
-                name=st.session_state.driver2_name,
-            ))
+            fig_anim.add_trace(
+                go.Scatter(
+                    x=[tel2["X"].iloc[0]],
+                    y=[tel2["Y"].iloc[0]],
+                    mode="markers",
+                    marker=dict(size=15, color=st.session_state.config.secondary_color),
+                    name=st.session_state.driver2_name,
+                )
+            )
 
             # Create frames for animation
             frames = []
             for i in range(0, len(tel1), step):
-                frames.append(go.Frame(
-                    data=[
-                        go.Scatter(x=tel1["X"], y=tel1["Y"]),  # Track
-                        go.Scatter(x=[tel1["X"].iloc[i]], y=[tel1["Y"].iloc[i]]),  # Driver 1
-                        go.Scatter(x=[tel2["X"].iloc[i]], y=[tel2["Y"].iloc[i]]),  # Driver 2
-                    ],
-                    name=str(i)
-                ))
+                frames.append(
+                    go.Frame(
+                        data=[
+                            go.Scatter(x=tel1["X"], y=tel1["Y"]),  # Track
+                            go.Scatter(x=[tel1["X"].iloc[i]], y=[tel1["Y"].iloc[i]]),  # Driver 1
+                            go.Scatter(x=[tel2["X"].iloc[i]], y=[tel2["Y"].iloc[i]]),  # Driver 2
+                        ],
+                        name=str(i),
+                    )
+                )
 
             fig_anim.frames = frames
 
             # Add play/pause buttons
             fig_anim.update_layout(
-                updatemenus=[{
-                    "type": "buttons",
-                    "showactive": False,
-                    "buttons": [
-                        {"label": "Play", "method": "animate", "args": [None, {"frame": {"duration": 50}}]},
-                        {"label": "Pause", "method": "animate", "args": [[None], {"frame": {"duration": 0}, "mode": "immediate"}]}
-                    ]
-                }],
+                updatemenus=[
+                    {
+                        "type": "buttons",
+                        "showactive": False,
+                        "buttons": [
+                            {
+                                "label": "Play",
+                                "method": "animate",
+                                "args": [None, {"frame": {"duration": 50}}],
+                            },
+                            {
+                                "label": "Pause",
+                                "method": "animate",
+                                "args": [[None], {"frame": {"duration": 0}, "mode": "immediate"}],
+                            },
+                        ],
+                    }
+                ],
                 xaxis=dict(scaleanchor="y", scaleratio=1, showgrid=False),
                 yaxis=dict(showgrid=False),
                 plot_bgcolor="rgba(0,0,0,0)",
@@ -528,7 +569,9 @@ def page_lap_compare():
             tel1_delta = st.session_state.comparison_summary["delta_time"]
             start_idx = int(distance_range[0] / total_distance * len(tel1_delta))
             end_idx = int(distance_range[1] / total_distance * len(tel1_delta))
-            sector_delta = tel1_delta[end_idx - 1] - tel1_delta[start_idx] if end_idx > start_idx else 0
+            sector_delta = (
+                tel1_delta[end_idx - 1] - tel1_delta[start_idx] if end_idx > start_idx else 0
+            )
 
             with col3:
                 st.metric("Delta", f"{sector_delta:+.3f}s")
@@ -606,7 +649,10 @@ def page_lap_compare():
     st.plotly_chart(fig_tb, use_container_width=True)
 
     # Gear comparison (nGear)
-    if "nGear" in st.session_state.telemetry1.columns and "nGear" in st.session_state.telemetry2.columns:
+    if (
+        "nGear" in st.session_state.telemetry1.columns
+        and "nGear" in st.session_state.telemetry2.columns
+    ):
         st.subheader("Gear Comparison")
 
         try:
@@ -615,22 +661,26 @@ def page_lap_compare():
             fig_gear = go.Figure()
 
             # Driver 1 gear
-            fig_gear.add_trace(go.Scatter(
-                x=st.session_state.telemetry1["Distance"],
-                y=st.session_state.telemetry1["nGear"],
-                mode="lines",
-                name=st.session_state.driver1_name,
-                line=dict(color=st.session_state.config.primary_color, width=2),
-            ))
+            fig_gear.add_trace(
+                go.Scatter(
+                    x=st.session_state.telemetry1["Distance"],
+                    y=st.session_state.telemetry1["nGear"],
+                    mode="lines",
+                    name=st.session_state.driver1_name,
+                    line=dict(color=st.session_state.config.primary_color, width=2),
+                )
+            )
 
             # Driver 2 gear
-            fig_gear.add_trace(go.Scatter(
-                x=st.session_state.telemetry2["Distance"],
-                y=st.session_state.telemetry2["nGear"],
-                mode="lines",
-                name=st.session_state.driver2_name,
-                line=dict(color=st.session_state.config.secondary_color, width=2),
-            ))
+            fig_gear.add_trace(
+                go.Scatter(
+                    x=st.session_state.telemetry2["Distance"],
+                    y=st.session_state.telemetry2["nGear"],
+                    mode="lines",
+                    name=st.session_state.driver2_name,
+                    line=dict(color=st.session_state.config.secondary_color, width=2),
+                )
+            )
 
             fig_gear.update_layout(
                 xaxis_title="Distance (m)",
@@ -725,7 +775,9 @@ def page_minisectors():
                     hide_index=True,
                 )
     else:
-        st.warning("⚠️ Brake telemetry data is not available for this session. Braking zones analysis cannot be performed.")
+        st.warning(
+            "⚠️ Brake telemetry data is not available for this session. Braking zones analysis cannot be performed."
+        )
 
     # Delta decomposition
     st.markdown("---")
@@ -811,30 +863,32 @@ def page_track_map():
         colors = np.where(
             delta_time < 0,
             st.session_state.config.primary_color,
-            st.session_state.config.secondary_color
+            st.session_state.config.secondary_color,
         )
 
         # Create scatter plot with colored segments
         fig_fastest = go.Figure()
 
         # Add track colored by fastest driver
-        fig_fastest.add_trace(go.Scatter(
-            x=tel1["X"],
-            y=tel1["Y"],
-            mode="markers",
-            marker=dict(
-                size=8,
-                color=colors,
-                colorscale=[
-                    [0, st.session_state.config.primary_color],
-                    [1, st.session_state.config.secondary_color]
-                ],
-                showscale=False,
-            ),
-            showlegend=False,  # Don't show track in legend
-            hovertemplate="Distance: %{text}<br>X: %{x}<br>Y: %{y}<extra></extra>",
-            text=[f"{d:.0f}m" for d in tel1["Distance"]],
-        ))
+        fig_fastest.add_trace(
+            go.Scatter(
+                x=tel1["X"],
+                y=tel1["Y"],
+                mode="markers",
+                marker=dict(
+                    size=8,
+                    color=colors,
+                    colorscale=[
+                        [0, st.session_state.config.primary_color],
+                        [1, st.session_state.config.secondary_color],
+                    ],
+                    showscale=False,
+                ),
+                showlegend=False,  # Don't show track in legend
+                hovertemplate="Distance: %{text}<br>X: %{x}<br>Y: %{y}<extra></extra>",
+                text=[f"{d:.0f}m" for d in tel1["Distance"]],
+            )
+        )
 
         fig_fastest.update_layout(
             xaxis=dict(scaleanchor="y", scaleratio=1, showgrid=False, title=""),
@@ -842,31 +896,31 @@ def page_track_map():
             plot_bgcolor="rgba(0,0,0,0)",
             height=600,
             showlegend=True,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1
-            )
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
 
         # Add legend manually
-        fig_fastest.add_trace(go.Scatter(
-            x=[None], y=[None],
-            mode='markers',
-            marker=dict(size=10, color=st.session_state.config.primary_color),
-            showlegend=True,
-            name=f"{st.session_state.driver1_name} faster"
-        ))
+        fig_fastest.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(size=10, color=st.session_state.config.primary_color),
+                showlegend=True,
+                name=f"{st.session_state.driver1_name} faster",
+            )
+        )
 
-        fig_fastest.add_trace(go.Scatter(
-            x=[None], y=[None],
-            mode='markers',
-            marker=dict(size=10, color=st.session_state.config.secondary_color),
-            showlegend=True,
-            name=f"{st.session_state.driver2_name} faster"
-        ))
+        fig_fastest.add_trace(
+            go.Scatter(
+                x=[None],
+                y=[None],
+                mode="markers",
+                marker=dict(size=10, color=st.session_state.config.secondary_color),
+                showlegend=True,
+                name=f"{st.session_state.driver2_name} faster",
+            )
+        )
 
         st.plotly_chart(fig_fastest, use_container_width=True)
     except Exception as e:

@@ -62,9 +62,7 @@ def render():
 
     # Lap filters
     with st.sidebar.expander("Lap Filters"):
-        exclude_outliers = st.checkbox(
-            "Exclude outlier laps", value=True, key="race_pace_outliers"
-        )
+        exclude_outliers = st.checkbox("Exclude outlier laps", value=True, key="race_pace_outliers")
         outlier_threshold = st.slider(
             "Outlier threshold (x median)",
             min_value=1.1,

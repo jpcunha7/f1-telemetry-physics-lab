@@ -197,14 +197,18 @@ def render():
     with col1:
         st.subheader("Throttle & Brake Distribution")
         fig_inputs = style_profile.create_throttle_brake_distribution_plot(
-            st.session_state.style_telemetry1, st.session_state.style_loaded_driver1, cfg.DEFAULT_CONFIG
+            st.session_state.style_telemetry1,
+            st.session_state.style_loaded_driver1,
+            cfg.DEFAULT_CONFIG,
         )
         st.plotly_chart(fig_inputs, use_container_width=True)
 
     with col2:
         st.subheader("Acceleration Distribution")
         fig_accel = style_profile.create_acceleration_distribution_plot(
-            st.session_state.style_telemetry1, st.session_state.style_loaded_driver1, cfg.DEFAULT_CONFIG
+            st.session_state.style_telemetry1,
+            st.session_state.style_loaded_driver1,
+            cfg.DEFAULT_CONFIG,
         )
         st.plotly_chart(fig_accel, use_container_width=True)
 

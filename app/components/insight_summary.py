@@ -47,8 +47,8 @@ def generate_insight_summary(
 
     # Sector-based analysis (3 sectors in F1)
     # We'll divide the lap into 3 sectors based on track distance
-    if 'delta_time' in comparison_summary and len(comparison_summary['delta_time']) > 0:
-        total_distance = len(comparison_summary['delta_time'])
+    if "delta_time" in comparison_summary and len(comparison_summary["delta_time"]) > 0:
+        total_distance = len(comparison_summary["delta_time"])
         sector_size = total_distance // 3
 
         sectors_info = []
@@ -56,18 +56,20 @@ def generate_insight_summary(
             start_idx = sector_num * sector_size
             end_idx = (sector_num + 1) * sector_size if sector_num < 2 else total_distance
 
-            sector_deltas = comparison_summary['delta_time'][start_idx:end_idx]
+            sector_deltas = comparison_summary["delta_time"][start_idx:end_idx]
             sector_delta = sector_deltas[-1] - sector_deltas[0] if len(sector_deltas) > 0 else 0
 
-            sectors_info.append({
-                'sector': f"Sector {sector_num + 1}",
-                'delta': sector_delta,
-                'favoring': driver1_name if sector_delta < 0 else driver2_name,
-            })
+            sectors_info.append(
+                {
+                    "sector": f"Sector {sector_num + 1}",
+                    "delta": sector_delta,
+                    "favoring": driver1_name if sector_delta < 0 else driver2_name,
+                }
+            )
             insights["sector_breakdown"][f"Sector {sector_num + 1}"] = sector_delta
 
         # Add top sectors to top_locations
-        sectors_sorted = sorted(sectors_info, key=lambda x: abs(x['delta']), reverse=True)
+        sectors_sorted = sorted(sectors_info, key=lambda x: abs(x["delta"]), reverse=True)
         for sector_info in sectors_sorted:
             insights["top_locations"].append(sector_info)
 

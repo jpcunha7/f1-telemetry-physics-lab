@@ -209,7 +209,11 @@ def compare_braking_zones(
         df["Approx_Time_Delta_s"] = df.apply(
             lambda row: (
                 (row[f"Start_Dist_{driver1_name}"] - row[f"Start_Dist_{driver2_name}"])
-                / ((row[f"Entry_Speed_{driver1_name}"] + row[f"Entry_Speed_{driver2_name}"]) / 2 / 3.6)
+                / (
+                    (row[f"Entry_Speed_{driver1_name}"] + row[f"Entry_Speed_{driver2_name}"])
+                    / 2
+                    / 3.6
+                )
                 if (row[f"Entry_Speed_{driver1_name}"] + row[f"Entry_Speed_{driver2_name}"]) > 0
                 else 0
             ),

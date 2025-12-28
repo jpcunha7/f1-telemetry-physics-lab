@@ -184,9 +184,7 @@ def minisector_data_to_dataframe(minisector_data: MinisectorData) -> pd.DataFram
     return df
 
 
-def get_top_minisector_gains(
-    minisector_data, n: int = 10
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+def get_top_minisector_gains(minisector_data, n: int = 10) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Get top N minisectors with biggest gains and losses.
 
