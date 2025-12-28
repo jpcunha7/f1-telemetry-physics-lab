@@ -145,6 +145,8 @@ def detect_braking_zones(
 def compare_braking_zones(
     zones1: List[BrakingZone],
     zones2: List[BrakingZone],
+    driver1_name: str = "Driver1",
+    driver2_name: str = "Driver2",
     distance_tolerance: float = 50.0,
 ) -> pd.DataFrame:
     """
@@ -155,6 +157,8 @@ def compare_braking_zones(
     Args:
         zones1: Braking zones for driver 1
         zones2: Braking zones for driver 2
+        driver1_name: Name/code for driver 1
+        driver2_name: Name/code for driver 2
         distance_tolerance: Maximum distance difference to match zones (meters)
 
     Returns:
@@ -176,23 +180,23 @@ def compare_braking_zones(
         if best_match:
             comp = {
                 "Zone_ID": z1.zone_id,
-                "Start_Dist_Driver1": z1.start_distance,
-                "Start_Dist_Driver2": best_match.start_distance,
+                f"Start_Dist_{driver1_name}": z1.start_distance,
+                f"Start_Dist_{driver2_name}": best_match.start_distance,
                 "Brake_Start_Delta_m": z1.start_distance - best_match.start_distance,
-                "Entry_Speed_Driver1": z1.entry_speed,
-                "Entry_Speed_Driver2": best_match.entry_speed,
+                f"Entry_Speed_{driver1_name}": z1.entry_speed,
+                f"Entry_Speed_{driver2_name}": best_match.entry_speed,
                 "Entry_Speed_Delta": z1.entry_speed - best_match.entry_speed,
-                "Min_Speed_Driver1": z1.min_speed,
-                "Min_Speed_Driver2": best_match.min_speed,
+                f"Min_Speed_{driver1_name}": z1.min_speed,
+                f"Min_Speed_{driver2_name}": best_match.min_speed,
                 "Min_Speed_Delta": z1.min_speed - best_match.min_speed,
-                "Exit_Speed_Driver1": z1.exit_speed,
-                "Exit_Speed_Driver2": best_match.exit_speed,
+                f"Exit_Speed_{driver1_name}": z1.exit_speed,
+                f"Exit_Speed_{driver2_name}": best_match.exit_speed,
                 "Exit_Speed_Delta": z1.exit_speed - best_match.exit_speed,
-                "Max_Decel_Driver1": z1.max_decel,
-                "Max_Decel_Driver2": best_match.max_decel,
+                f"Max_Decel_{driver1_name}": z1.max_decel,
+                f"Max_Decel_{driver2_name}": best_match.max_decel,
                 "Max_Decel_Delta": z1.max_decel - best_match.max_decel,
-                "Duration_Driver1": z1.duration,
-                "Duration_Driver2": best_match.duration,
+                f"Duration_{driver1_name}": z1.duration,
+                f"Duration_{driver2_name}": best_match.duration,
                 "Duration_Delta": z1.duration - best_match.duration,
             }
             comparisons.append(comp)
@@ -204,9 +208,9 @@ def compare_braking_zones(
         # Simple approximation: time delta ~ distance_delta / avg_speed
         df["Approx_Time_Delta_s"] = df.apply(
             lambda row: (
-                (row["Start_Dist_Driver1"] - row["Start_Dist_Driver2"])
-                / ((row["Entry_Speed_Driver1"] + row["Entry_Speed_Driver2"]) / 2 / 3.6)
-                if (row["Entry_Speed_Driver1"] + row["Entry_Speed_Driver2"]) > 0
+                (row[f"Start_Dist_{driver1_name}"] - row[f"Start_Dist_{driver2_name}"])
+                / ((row[f"Entry_Speed_{driver1_name}"] + row[f"Entry_Speed_{driver2_name}"]) / 2 / 3.6)
+                if (row[f"Entry_Speed_{driver1_name}"] + row[f"Entry_Speed_{driver2_name}"]) > 0
                 else 0
             ),
             axis=1,

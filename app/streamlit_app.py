@@ -273,7 +273,7 @@ def load_data(params):
                 braking_zones1 = braking_zones.detect_braking_zones(tel1, config)
                 braking_zones2 = braking_zones.detect_braking_zones(tel2, config)
                 braking_comparison = braking_zones.compare_braking_zones(
-                    braking_zones1, braking_zones2
+                    braking_zones1, braking_zones2, params["driver1"], params["driver2"]
                 )
 
             # Create comparison summary
@@ -665,21 +665,23 @@ def page_minisectors():
 
     if not st.session_state.braking_comparison.empty:
         st.markdown("**Zone-by-Zone Comparison**")
+        driver1 = st.session_state.driver1_name
+        driver2 = st.session_state.driver2_name
         st.dataframe(
             st.session_state.braking_comparison[
                 [
                     "Zone_ID",
-                    "Start_Dist_Driver1",
-                    "Start_Dist_Driver2",
+                    f"Start_Dist_{driver1}",
+                    f"Start_Dist_{driver2}",
                     "Brake_Start_Delta_m",
-                    "Entry_Speed_Driver1",
-                    "Entry_Speed_Driver2",
+                    f"Entry_Speed_{driver1}",
+                    f"Entry_Speed_{driver2}",
                     "Entry_Speed_Delta",
-                    "Min_Speed_Driver1",
-                    "Min_Speed_Driver2",
+                    f"Min_Speed_{driver1}",
+                    f"Min_Speed_{driver2}",
                     "Min_Speed_Delta",
-                    "Max_Decel_Driver1",
-                    "Max_Decel_Driver2",
+                    f"Max_Decel_{driver1}",
+                    f"Max_Decel_{driver2}",
                     "Max_Decel_Delta",
                 ]
             ],

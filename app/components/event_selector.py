@@ -55,7 +55,7 @@ def render_event_selector(
 
     if schedule.empty:
         # Fallback to text input
-        event_identifier = st.text_input(
+        event_identifier = st.sidebar.text_input(
             "Event",
             value="Monaco",
             key=f"{key_prefix}_fallback_input",
@@ -87,7 +87,7 @@ def render_event_selector(
             }
 
         # Dropdown selector
-        selected_label = st.selectbox(
+        selected_label = st.sidebar.selectbox(
             "Event",
             options=event_options,
             key=f"{key_prefix}_dropdown",

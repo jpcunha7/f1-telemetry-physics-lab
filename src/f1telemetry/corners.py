@@ -79,12 +79,12 @@ def get_circuit_corners(session, telemetry: pd.DataFrame, config: Config = DEFAU
         List of Corner objects with telemetry-based metrics for each circuit corner
     """
     try:
-        # Get circuit info from session
-        if not hasattr(session, 'circuit_info') or session.circuit_info is None:
+        # Get circuit info from session using get_circuit_info() method
+        circuit_info = session.get_circuit_info()
+
+        if circuit_info is None:
             logger.warning("Circuit info not available, falling back to telemetry-based detection")
             return detect_corners(telemetry, config=config)
-
-        circuit_info = session.circuit_info
 
         # Check if corners data is available
         if not hasattr(circuit_info, 'corners') or circuit_info.corners is None or circuit_info.corners.empty:
